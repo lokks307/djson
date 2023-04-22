@@ -11,33 +11,37 @@ import (
 	gov "github.com/asaskevich/govalidator"
 )
 
-func ConverMapToObject(dmap map[string]interface{}) *DO {
-	nObj := NewObject()
+func MapToObject(dmap map[string]interface{}) *DO {
+	nObj := NewDO()
 	for k, v := range dmap {
 		nObj.Put(k, v)
 	}
 	return nObj
 }
 
-func ConvertSliceToArray(dslice []interface{}) *DA {
-	nArr := NewArray()
+func SliceToArray(dslice []interface{}) *DA {
+	nArr := NewDA()
 	nArr.Put(dslice)
 	return nArr
 }
 
-func ConverObjectToMap(obj *DO) map[string]interface{} {
+func ObjectToMap(obj *DO) map[string]interface{} {
 	wMap := make(map[string]interface{})
+
+	if obj == nil {
+		return wMap
+	}
 
 	for k, v := range obj.Map {
 		switch t := v.(type) {
 		case DA:
-			wMap[k] = ConvertArrayToSlice(&t)
+			wMap[k] = ArrayToSlice(&t)
 		case DO:
-			wMap[k] = ConverObjectToMap(&t)
+			wMap[k] = ObjectToMap(&t)
 		case *DA:
-			wMap[k] = ConvertArrayToSlice(t)
+			wMap[k] = ArrayToSlice(t)
 		case *DO:
-			wMap[k] = ConverObjectToMap(t)
+			wMap[k] = ObjectToMap(t)
 		default:
 			wMap[k] = v
 		}
@@ -46,20 +50,24 @@ func ConverObjectToMap(obj *DO) map[string]interface{} {
 	return wMap
 }
 
-func ConvertArrayToSlice(arr *DA) []interface{} {
+func ArrayToSlice(arr *DA) []interface{} {
 
 	wArray := make([]interface{}, 0)
+
+	if arr == nil {
+		return wArray
+	}
 
 	for idx := range arr.Element {
 		switch t := arr.Element[idx].(type) {
 		case DA:
-			wArray = append(wArray, ConvertArrayToSlice(&t))
+			wArray = append(wArray, ArrayToSlice(&t))
 		case DO:
-			wArray = append(wArray, ConverObjectToMap(&t))
+			wArray = append(wArray, ObjectToMap(&t))
 		case *DA:
-			wArray = append(wArray, ConvertArrayToSlice(t))
+			wArray = append(wArray, ArrayToSlice(t))
 		case *DO:
-			wArray = append(wArray, ConverObjectToMap(t))
+			wArray = append(wArray, ObjectToMap(t))
 		default:
 			wArray = append(wArray, t)
 		}
@@ -192,7 +200,7 @@ func ParseToArray(doc string) (*DA, error) {
 }
 
 func ParseObject(data map[string]interface{}) *DO {
-	obj := NewObject()
+	obj := NewDO()
 	for k, v := range data {
 		if IsBaseType(v) {
 			obj.Put(k, v)
@@ -226,7 +234,7 @@ func ParseObject(data map[string]interface{}) *DO {
 }
 
 func ParseArray(data []interface{}) *DA {
-	arr := NewArray()
+	arr := NewDA()
 
 	for idx := range data {
 		if IsBaseType(data[idx]) {

@@ -12,7 +12,7 @@ type DO struct {
 	Map map[string]interface{}
 }
 
-func NewObject() *DO {
+func NewDO() *DO {
 	return &DO{
 		Map: make(map[string]interface{}),
 	}
@@ -90,17 +90,17 @@ func (m *DO) Put(key string, value interface{}) *DO {
 	case *DA:
 		m.Map[key] = t
 	case map[string]interface{}:
-		m.Map[key] = ConverMapToObject(t)
+		m.Map[key] = MapToObject(t)
 	case []interface{}:
-		m.Map[key] = ConvertSliceToArray(t)
+		m.Map[key] = SliceToArray(t)
 	case Object:
-		m.Map[key] = ConverMapToObject(t)
+		m.Map[key] = MapToObject(t)
 	case Array:
-		m.Map[key] = ConvertSliceToArray(t)
-	case DJSON:
-		m.Map[key] = t.GetAsInterface()
-	case *DJSON:
-		m.Map[key] = t.GetAsInterface()
+		m.Map[key] = SliceToArray(t)
+	case JSON:
+		m.Map[key] = t.Interface()
+	case *JSON:
+		m.Map[key] = t.Interface()
 	case nil:
 		m.Map[key] = nil
 	}
@@ -109,7 +109,7 @@ func (m *DO) Put(key string, value interface{}) *DO {
 }
 
 func (m *DO) PutAsArray(key string, array ...interface{}) *DO {
-	nArray := NewArray()
+	nArray := NewDA()
 	nArray.Put(array)
 	m.Put(key, nArray)
 	return m
@@ -128,7 +128,7 @@ func (m *DO) HasKey(key string) bool {
 	return ok
 }
 
-func (m *DO) GetAsString(key string) string {
+func (m *DO) String(key string) string {
 	if key == "" {
 		return ""
 	}
@@ -158,7 +158,7 @@ func (m *DO) GetAsString(key string) string {
 	return ""
 }
 
-func (m *DO) GetAsString2(key string) (string, bool) {
+func (m *DO) String2(key string) (string, bool) {
 	value, ok := m.Map[key]
 	if !ok {
 		return "", false
@@ -300,12 +300,12 @@ func (m *DO) Remove(keys ...string) *DO {
 }
 
 func (m *DO) ToStringPretty() string {
-	jsonByte, _ := json.MarshalIndent(ConverObjectToMap(m), "", "   ")
+	jsonByte, _ := json.MarshalIndent(ObjectToMap(m), "", "   ")
 	return string(jsonByte)
 }
 
 func (m *DO) ToString() string {
-	jsonByte, err := json.Marshal(ConverObjectToMap(m))
+	jsonByte, err := json.Marshal(ObjectToMap(m))
 	if err != nil {
 		// log.Println(err)
 		return ""
@@ -378,8 +378,8 @@ func (m *DO) Equal(t *DO) bool {
 				return false
 			}
 		case "*djson.DJSON":
-			mjson := m.Map[i].(*DJSON)
-			tjson := t.Map[i].(*DJSON)
+			mjson := m.Map[i].(*JSON)
+			tjson := t.Map[i].(*JSON)
 
 			if !mjson.Equal(tjson) {
 				return false
@@ -392,7 +392,7 @@ func (m *DO) Equal(t *DO) bool {
 
 func (m *DO) Clone() *DO {
 
-	t := NewObject()
+	t := NewDO()
 
 	t.Map = make(map[string]interface{})
 
@@ -421,7 +421,7 @@ func (m *DO) Clone() *DO {
 			mda := m.Map[k].(*DA)
 			t.Map[k] = mda.Clone()
 		case "*djson.DJSON":
-			mdjson := m.Map[k].(*DJSON)
+			mdjson := m.Map[k].(*JSON)
 			t.Map[k] = mdjson.Clone()
 		}
 	}

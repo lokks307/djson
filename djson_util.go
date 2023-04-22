@@ -7,49 +7,49 @@ import (
 	"github.com/volatiletech/null/v8"
 )
 
-func (m *DJSON) Size() int {
-	return m.Length()
+func (m *JSON) Size() int {
+	return m.Len()
 }
 
-func (m *DJSON) Length() int {
-	if m.JsonType == JSON_NULL {
+func (m *JSON) Len() int {
+	if m._Type == NULL {
 		return 0
 	}
 
-	if m.JsonType == JSON_ARRAY {
-		return m.Array.Length()
+	if m._Type == ARRAY {
+		return m._Array.Length()
 	}
 
-	if m.JsonType == JSON_OBJECT {
-		return m.Object.Length()
+	if m._Type == OBJECT {
+		return m._Object.Length()
 	}
 
 	return 1
 }
 
-func (m *DJSON) HasKey(key interface{}) bool {
+func (m *JSON) HasKey(key interface{}) bool {
 	switch tkey := key.(type) {
 	case string:
-		if m.JsonType == JSON_OBJECT {
-			return m.Object.HasKey(tkey)
+		if m._Type == OBJECT {
+			return m._Object.HasKey(tkey)
 		}
 	case int:
-		if m.JsonType == JSON_ARRAY {
-			return tkey >= 0 && m.Array.Size() > tkey
+		if m._Type == ARRAY {
+			return tkey >= 0 && m._Array.Size() > tkey
 		}
 	}
 
 	return false
 }
 
-func (m *DJSON) toFieldsValue(val reflect.Value, tags ...string) {
+func (m *JSON) toFieldsValue(val reflect.Value, tags ...string) {
 
 	for i := 0; i < val.NumField(); i++ {
-		eachVal := val.Field(i)
+		eval := val.Field(i)
 		eachType := val.Type().Field(i)
 		eachTag := eachType.Tag.Get("json")
 
-		if !eachVal.CanSet() || !m.HasKey(eachTag) {
+		if !eval.CanSet() || !m.HasKey(eachTag) {
 			continue
 		}
 
@@ -63,51 +63,51 @@ func (m *DJSON) toFieldsValue(val reflect.Value, tags ...string) {
 
 			switch eachType.Type.String() {
 			case "null.String":
-				eachVal.FieldByName("String").SetString(m.GetAsString(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("String").SetString(m.String(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Bool":
-				eachVal.FieldByName("Bool").SetBool(m.GetAsBool(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Bool").SetBool(m.Bool(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Float32":
-				eachVal.FieldByName("Float32").SetFloat(m.GetAsFloat(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Float32").SetFloat(m.Float(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Float64":
-				eachVal.FieldByName("Float64").SetFloat(m.GetAsFloat(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Float64").SetFloat(m.Float(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Int":
-				eachVal.FieldByName("Int").SetInt(m.GetAsInt(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Int").SetInt(m.Int(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Int8":
-				eachVal.FieldByName("Int8").SetInt(m.GetAsInt(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Int8").SetInt(m.Int(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Int16":
-				eachVal.FieldByName("Int16").SetInt(m.GetAsInt(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Int16").SetInt(m.Int(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Int32":
-				eachVal.FieldByName("Int32").SetInt(m.GetAsInt(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Int32").SetInt(m.Int(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Int64":
-				eachVal.FieldByName("Int64").SetInt(m.GetAsInt(eachTag))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Int64").SetInt(m.Int(eachTag))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Uint":
-				eachVal.FieldByName("Uint").SetUint(uint64(m.GetAsInt(eachTag)))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Uint").SetUint(uint64(m.Int(eachTag)))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Uint8":
-				eachVal.FieldByName("Uint8").SetUint(uint64(m.GetAsInt(eachTag)))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Uint8").SetUint(uint64(m.Int(eachTag)))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Uint16":
-				eachVal.FieldByName("Uint16").SetUint(uint64(m.GetAsInt(eachTag)))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Uint16").SetUint(uint64(m.Int(eachTag)))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Uint32":
-				eachVal.FieldByName("Uint32").SetUint(uint64(m.GetAsInt(eachTag)))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Uint32").SetUint(uint64(m.Int(eachTag)))
+				eval.FieldByName("Valid").SetBool(true)
 			case "null.Uint64":
-				eachVal.FieldByName("Uint64").SetUint(uint64(m.GetAsInt(eachTag)))
-				eachVal.FieldByName("Valid").SetBool(true)
+				eval.FieldByName("Uint64").SetUint(uint64(m.Int(eachTag)))
+				eval.FieldByName("Valid").SetBool(true)
 			default:
 
-				if oJson, ok := m.GetAsObject(eachTag); ok {
-					oJson.toFieldsValue(eachVal, downDepthWW(tags)...)
+				if oJson, ok := m.Object(eachTag); ok {
+					oJson.toFieldsValue(eval, downDepthWW(tags)...)
 				}
 
 			}
@@ -116,27 +116,27 @@ func (m *DJSON) toFieldsValue(val reflect.Value, tags ...string) {
 
 			switch eachType.Type.String() {
 			case "int", "int8", "int16", "int32", "int64":
-				eachVal.SetInt(m.GetAsInt(eachTag))
+				eval.SetInt(m.Int(eachTag))
 			case "uint", "uint8", "uint16", "uint32", "uint64":
-				eachVal.SetUint(uint64(m.GetAsInt(eachTag)))
+				eval.SetUint(uint64(m.Int(eachTag)))
 			case "float32", "float64":
-				eachVal.SetFloat(m.GetAsFloat(eachTag))
+				eval.SetFloat(m.Float(eachTag))
 			case "string":
-				eachVal.SetString(m.GetAsString(eachTag))
+				eval.SetString(m.String(eachTag))
 			case "bool":
-				eachVal.SetBool(m.GetAsBool(eachTag))
+				eval.SetBool(m.Bool(eachTag))
 			}
 		}
 	}
 }
 
-func (m *DJSON) ToFields(st interface{}, tags ...string) {
+func (m *JSON) ToFields(st interface{}, tags ...string) {
 	target := reflect.ValueOf(st)
 	elements := target.Elem()
 	m.toFieldsValue(elements, tags...)
 }
 
-func (m *DJSON) fromFieldsValue(val reflect.Value, tags ...string) {
+func (m *JSON) fromFieldsValue(val reflect.Value, tags ...string) {
 
 	kind := val.Type().Kind()
 
@@ -148,58 +148,58 @@ func (m *DJSON) fromFieldsValue(val reflect.Value, tags ...string) {
 
 			switch eachVal.Kind() {
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-				m.PutAsArray(eachVal.Int())
+				m.PutArray(eachVal.Int())
 			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-				m.PutAsArray(eachVal.Uint())
+				m.PutArray(eachVal.Uint())
 			case reflect.Bool:
-				m.PutAsArray(eachVal.Bool())
+				m.PutArray(eachVal.Bool())
 			case reflect.String:
-				m.PutAsArray(eachVal.String())
+				m.PutArray(eachVal.String())
 			case reflect.Float32, reflect.Float64:
-				m.PutAsArray(eachVal.Float())
+				m.PutArray(eachVal.Float())
 			case reflect.Array, reflect.Slice:
-				sJson := NewDJSON()
-				sJson.SetAsArray()
+				sJson := New()
+				sJson.SetToArray()
 				sJson.fromFieldsValue(eachVal, downDepthWW(tags)...)
-				m.PutAsArray(sJson)
+				m.PutArray(sJson)
 			case reflect.Struct, reflect.Map:
 				switch eachType.String() {
 				case "null.String":
-					m.PutAsArray(eachVal.FieldByName("String").String())
+					m.PutArray(eachVal.FieldByName("String").String())
 				case "null.Bool":
-					m.PutAsArray(eachVal.FieldByName("Bool").Bool())
+					m.PutArray(eachVal.FieldByName("Bool").Bool())
 				case "null.Float32":
-					m.PutAsArray(eachVal.FieldByName("Float32").Float())
+					m.PutArray(eachVal.FieldByName("Float32").Float())
 				case "null.Float64":
-					m.PutAsArray(eachVal.FieldByName("Float64").Float())
+					m.PutArray(eachVal.FieldByName("Float64").Float())
 				case "null.Int":
-					m.PutAsArray(eachVal.FieldByName("Int").Int())
+					m.PutArray(eachVal.FieldByName("Int").Int())
 				case "null.Int8":
-					m.PutAsArray(eachVal.FieldByName("Int8").Int())
+					m.PutArray(eachVal.FieldByName("Int8").Int())
 				case "null.Int16":
-					m.PutAsArray(eachVal.FieldByName("Int16").Int())
+					m.PutArray(eachVal.FieldByName("Int16").Int())
 				case "null.Int32":
-					m.PutAsArray(eachVal.FieldByName("Int32").Int())
+					m.PutArray(eachVal.FieldByName("Int32").Int())
 				case "null.Int64":
-					m.PutAsArray(eachVal.FieldByName("Int64").Int())
+					m.PutArray(eachVal.FieldByName("Int64").Int())
 				case "null.Uint":
-					m.PutAsArray(eachVal.FieldByName("Uint").Uint())
+					m.PutArray(eachVal.FieldByName("Uint").Uint())
 				case "null.Uint8":
-					m.PutAsArray(eachVal.FieldByName("Uint8").Uint())
+					m.PutArray(eachVal.FieldByName("Uint8").Uint())
 				case "null.Uint16":
-					m.PutAsArray(eachVal.FieldByName("Uint16").Uint())
+					m.PutArray(eachVal.FieldByName("Uint16").Uint())
 				case "null.Uint32":
-					m.PutAsArray(eachVal.FieldByName("Uint32").Uint())
+					m.PutArray(eachVal.FieldByName("Uint32").Uint())
 				case "null.Uint64":
-					m.PutAsArray(eachVal.FieldByName("Uint64").Uint())
+					m.PutArray(eachVal.FieldByName("Uint64").Uint())
 				default:
-					sJson := NewDJSON()
-					sJson.SetAsObject()
+					sJson := New()
+					sJson.SetToObject()
 					sJson.fromFieldsValue(eachVal, downDepthWW(tags)...)
-					m.PutAsArray(sJson)
+					m.PutArray(sJson)
 				}
 			default:
-				m.PutAsArray(nil)
+				m.PutArray(nil)
 			}
 
 		}
@@ -249,15 +249,15 @@ func (m *DJSON) fromFieldsValue(val reflect.Value, tags ...string) {
 				case "null.Uint64":
 					m.Put(eachTag, eachVal.FieldByName("Uint64").Uint())
 				default:
-					sJson := NewDJSON()
-					sJson.SetAsObject()
+					sJson := New()
+					sJson.SetToObject()
 					sJson.fromFieldsValue(eachVal, downDepthWW(tags)...)
 					m.Put(eachTag, sJson)
 				}
 			} else if eachKind == reflect.Array || eachKind == reflect.Slice {
 
-				sJson := NewDJSON()
-				sJson.SetAsArray()
+				sJson := New()
+				sJson.SetToArray()
 				sJson.fromFieldsValue(eachVal, downDepthWW(tags)...)
 				m.Put(eachTag, sJson)
 
@@ -355,8 +355,8 @@ func (m *DJSON) fromFieldsValue(val reflect.Value, tags ...string) {
 				skind := reflect.ValueOf(t).Type().Kind()
 
 				if skind == reflect.Struct || skind == reflect.Map {
-					sJson := NewDJSON()
-					sJson.SetAsObject()
+					sJson := New()
+					sJson.SetToObject()
 					sJson.FromFields(t, downDepthWW(tags)...)
 					m.Put(eachKey, sJson)
 				}
@@ -367,19 +367,19 @@ func (m *DJSON) fromFieldsValue(val reflect.Value, tags ...string) {
 	}
 }
 
-func (m *DJSON) FromFields(st interface{}, tags ...string) *DJSON {
+func (m *JSON) FromFields(st interface{}, tags ...string) *JSON {
 	baseValue := reflect.ValueOf(st)
 
 	kind := baseValue.Type().Kind()
 
 	if kind == reflect.Array || kind == reflect.Slice {
 
-		m.SetAsArray()
+		m.SetToArray()
 		m.fromFieldsValue(baseValue, tags...)
 
 	} else if kind == reflect.Struct || kind == reflect.Map {
 
-		m.SetAsObject()
+		m.SetToObject()
 		m.fromFieldsValue(baseValue, tags...)
 
 	}
@@ -413,26 +413,26 @@ func inTags(idv string, tags ...string) bool {
 	return false
 }
 
-func (m *DJSON) doSort(isAsc bool, k ...interface{}) bool {
+func (m *JSON) doSort(isAsc bool, k ...interface{}) bool {
 	var tArray *DA
 
 	if len(k) == 0 {
-		if m.JsonType == JSON_ARRAY {
-			tArray = m.Array
+		if m._Type == ARRAY {
+			tArray = m._Array
 		}
 	}
 
 	if len(k) > 0 {
 
-		if m.JsonType == JSON_OBJECT {
+		if m._Type == OBJECT {
 			if key, ok := k[0].(string); ok {
-				if da, ok := m.Object.GetAsArray(key); ok {
+				if da, ok := m._Object.GetAsArray(key); ok {
 					tArray = da
 				}
 			}
-		} else if m.JsonType == JSON_ARRAY {
+		} else if m._Type == ARRAY {
 			if idx, ok := k[0].(int); ok {
-				if da, ok := m.Array.GetAsArray(idx); ok {
+				if da, ok := m._Array.GetAsArray(idx); ok {
 					tArray = da
 				}
 			}
@@ -446,78 +446,78 @@ func (m *DJSON) doSort(isAsc bool, k ...interface{}) bool {
 	}
 }
 
-func (m *DJSON) SortAsc(k ...interface{}) bool {
+func (m *JSON) SortAsc(k ...interface{}) bool {
 	return m.doSort(true, k...)
 }
 
-func (m *DJSON) SortDesc(k ...interface{}) bool {
+func (m *JSON) SortDesc(k ...interface{}) bool {
 	return m.doSort(false, k...)
 }
 
-func (m *DJSON) SortObjectArray(isAsc bool, key string) bool {
-	if m.JsonType != JSON_ARRAY {
+func (m *JSON) SortObjectArray(isAsc bool, key string) bool {
+	if m._Type != ARRAY {
 		return false
 	}
 
-	return m.Array.SortObject(isAsc, key)
+	return m._Array.SortObject(isAsc, key)
 }
 
-func (m *DJSON) SortObjectArrayAsc(key string) bool {
+func (m *JSON) SortObjectArrayAsc(key string) bool {
 	return m.SortObjectArray(true, key)
 }
 
-func (m *DJSON) SortObjectArrayDesc(key string) bool {
+func (m *JSON) SortObjectArrayDesc(key string) bool {
 	return m.SortObjectArray(false, key)
 }
 
-func (m *DJSON) Equal(t *DJSON) bool {
-	if m.JsonType != t.JsonType {
+func (m *JSON) Equal(t *JSON) bool {
+	if m._Type != t._Type {
 		return false
 	}
 
-	switch m.JsonType {
-	case JSON_NULL:
+	switch m._Type {
+	case NULL:
 		return true
-	case JSON_BOOL:
-		return m.Bool == t.Bool
-	case JSON_INT:
-		return m.Int == t.Int
-	case JSON_FLOAT:
-		return m.Float == t.Float
-	case JSON_STRING:
-		return m.String == t.String
-	case JSON_OBJECT:
-		return m.Object.Equal(t.Object)
-	case JSON_ARRAY:
-		return m.Array.Equal(t.Array)
+	case BOOL:
+		return m._Bool == t._Bool
+	case INT:
+		return m._Int == t._Int
+	case FLOAT:
+		return m._Float == t._Float
+	case STRING:
+		return m._String == t._String
+	case OBJECT:
+		return m._Object.Equal(t._Object)
+	case ARRAY:
+		return m._Array.Equal(t._Array)
 	}
 
 	return false
 }
 
-func (m *DJSON) Clone() *DJSON {
-	t := NewDJSON(m.JsonType)
+func (m *JSON) Clone() *JSON {
+	t := New(m._Type)
 
-	switch m.JsonType {
-	case JSON_NULL:
-	case JSON_BOOL:
-		t.Bool = m.Bool
-	case JSON_INT:
-		t.Int = m.Int
-	case JSON_FLOAT:
-		t.Float = m.Float
-	case JSON_STRING:
-		t.String = m.String
-	case JSON_OBJECT:
-		t.Object = m.Object.Clone()
-	case JSON_ARRAY:
-		t.Array = m.Array.Clone()
+	switch m._Type {
+	case NULL:
+	case BOOL:
+		t._Bool = m._Bool
+	case INT:
+		t._Int = m._Int
+	case FLOAT:
+		t._Float = m._Float
+	case STRING:
+		t._String = m._String
+	case OBJECT:
+		t._Object = m._Object.Clone()
+	case ARRAY:
+		t._Array = m._Array.Clone()
 	}
 
 	return t
 }
 
-func (m *DJSON) HasKeys(k ...interface{}) bool {
+func (m *JSON) HasKeys(k ...interface{}) bool {
 	for i := range k {
 		if !m.HasKey(k[i]) {
 			return false
@@ -527,40 +527,40 @@ func (m *DJSON) HasKeys(k ...interface{}) bool {
 	return true
 }
 
-func (m *DJSON) GetKeys(k ...interface{}) []string {
+func (m *JSON) GetKeys(k ...interface{}) []string {
 	rk := make([]string, 0)
 
 	if IsEmptyArg(k) {
-		if m.JsonType != JSON_OBJECT {
+		if m._Type != OBJECT {
 			return rk
 		}
 
-		for k := range m.Object.Map {
+		for k := range m._Object.Map {
 			rk = append(rk, k)
 		}
 
 		return rk
 	}
 
-	if t, ok := m.GetAsObject(k[0]); ok {
+	if t, ok := m.Object(k[0]); ok {
 		return t.GetKeys()
 	}
 
 	return rk
 }
 
-func (m *DJSON) Find(key string, val string) *DJSON {
-	if key == "" || m.JsonType != JSON_ARRAY {
+func (m *JSON) Find(key string, val string) *JSON {
+	if key == "" || m._Type != ARRAY {
 		return nil
 	}
 
-	for i := 0; i < m.Length(); i++ {
-		each, ok := m.GetAsObject(i)
+	for i := 0; i < m.Len(); i++ {
+		each, ok := m.Object(i)
 		if !ok {
 			continue
 		}
 
-		if each.GetAsString(key) == val {
+		if each.String(key) == val {
 			return each
 		}
 	}
@@ -568,13 +568,13 @@ func (m *DJSON) Find(key string, val string) *DJSON {
 	return nil
 }
 
-func (m *DJSON) Append(arrJson *DJSON) *DJSON {
-	if arrJson == nil || m.JsonType != JSON_ARRAY || !arrJson.IsArray() {
+func (m *JSON) Append(arrJson *JSON) *JSON {
+	if arrJson == nil || m._Type != ARRAY || !arrJson.IsArray() {
 		return m
 	}
 
-	for i := 0; i < arrJson.Length(); i++ {
-		m.PutAsArray(arrJson.Array.Element[i])
+	for i := 0; i < arrJson.Len(); i++ {
+		m.PutArray(arrJson._Array.Element[i])
 	}
 
 	return m

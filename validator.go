@@ -183,13 +183,13 @@ type VItem struct {
 }
 
 type Validator struct {
-	Syntax    *DJSON
+	Syntax    *JSON
 	RootItems []*VItem
 }
 
 func NewValidator() *Validator {
 	return &Validator{
-		Syntax: NewDJSON(),
+		Syntax: New(),
 	}
 }
 
@@ -197,7 +197,7 @@ func (m *Validator) Compile(syntax string) bool {
 	m.Syntax.Parse(syntax)
 
 	if !m.Syntax.IsObject() && !m.Syntax.IsString() && !m.Syntax.IsArray() {
-		m.Syntax = NewDJSON()
+		m.Syntax = New()
 		return false
 	}
 
@@ -222,13 +222,13 @@ func (m *Validator) Compile(syntax string) bool {
 	return true
 }
 
-func GetVItem(name string, ejson *DJSON) *VItem {
+func GetVItem(name string, ejson *JSON) *VItem {
 	eitem := new(VItem)
 	eitem.Name = name
 	etype := ""
 
 	if ejson.IsString() {
-		etype = ejson.GetAsString()
+		etype = ejson.String()
 
 		switch etype {
 		case "INT":
@@ -297,49 +297,49 @@ func GetVItem(name string, ejson *DJSON) *VItem {
 
 	} else if ejson.IsObject() {
 
-		etype = ejson.GetAsString("type")
-		eitem.IsRequred = ejson.GetAsBool("required")
-		if ejson.GetAsString("regexp") != "" {
-			eitem.RegExp, _ = regexp.Compile(ejson.GetAsString("regexp"))
+		etype = ejson.String("type")
+		eitem.IsRequred = ejson.Bool("required")
+		if ejson.String("regexp") != "" {
+			eitem.RegExp, _ = regexp.Compile(ejson.String("regexp"))
 		}
 
 		switch etype {
 		case "INT":
 			eitem.Type = V_TYPE_INT
-			eitem.Min = ejson.GetAsInt("min", int64(-9007199254740991))
-			eitem.Max = ejson.GetAsInt("max", int64(9007199254740991))
+			eitem.Min = ejson.Int("min", int64(-9007199254740991))
+			eitem.Max = ejson.Int("max", int64(9007199254740991))
 		case "UNIXTIME", "UINT":
 			eitem.Type = V_TYPE_INT
-			eitem.Min = ejson.GetAsInt("min", 0)
-			eitem.Max = ejson.GetAsInt("max", int64(9007199254740991))
+			eitem.Min = ejson.Int("min", 0)
+			eitem.Max = ejson.Int("max", int64(9007199254740991))
 
 			if eitem.Min < 0 {
 				eitem.Min = 0
 			}
 		case "FLOAT":
 			eitem.Type = V_TYPE_FLOAT
-			eitem.MinFloat = ejson.GetAsFloat("min", float64(-1.7976931348623157e+308))
-			eitem.MaxFloat = ejson.GetAsFloat("max", float64(1.7976931348623157e+308))
+			eitem.MinFloat = ejson.Float("min", float64(-1.7976931348623157e+308))
+			eitem.MaxFloat = ejson.Float("max", float64(1.7976931348623157e+308))
 		case "NUMBER":
 			eitem.Type = V_TYPE_NUMBER
-			eitem.MinFloat = ejson.GetAsFloat("min", float64(-1.7976931348623157e+308))
-			eitem.MaxFloat = ejson.GetAsFloat("max", float64(1.7976931348623157e+308))
+			eitem.MinFloat = ejson.Float("min", float64(-1.7976931348623157e+308))
+			eitem.MaxFloat = ejson.Float("max", float64(1.7976931348623157e+308))
 		case "STRING":
 			eitem.Type = V_TYPE_STRING
 			if ejson.IsInt("size") {
-				eitem.Min = ejson.GetAsInt("size")
+				eitem.Min = ejson.Int("size")
 				eitem.Max = eitem.Min
 			} else {
-				eitem.Min = ejson.GetAsInt("min", 0)
-				eitem.Max = ejson.GetAsInt("max", 8192)
+				eitem.Min = ejson.Int("min", 0)
+				eitem.Max = ejson.Int("max", 8192)
 			}
 		case "MIN.MAX.STRING":
 			eitem.Type = V_TYPE_STRING
-			eitem.Min = ejson.GetAsInt("min", 0)
-			eitem.Max = ejson.GetAsInt("max", 8192)
+			eitem.Min = ejson.Int("min", 0)
+			eitem.Max = ejson.Int("max", 8192)
 			eitem.CheckFunc = CheckFuncMinMaxString
 		case "OBJECT":
-			subJson, ok := ejson.GetAsObject("object")
+			subJson, ok := ejson.Object("object")
 			if ok {
 				eitem.Type = V_TYPE_OBJECT
 				ks := subJson.GetKeys()
@@ -357,11 +357,11 @@ func GetVItem(name string, ejson *DJSON) *VItem {
 		case "NONEMPTY.STRING":
 			eitem.Type = V_TYPE_STRING
 			if ejson.IsInt("size") {
-				eitem.Min = ejson.GetAsInt("size")
+				eitem.Min = ejson.Int("size")
 				eitem.Max = eitem.Min
 			} else {
-				eitem.Min = ejson.GetAsInt("min", 1)
-				eitem.Max = ejson.GetAsInt("max", 8192)
+				eitem.Min = ejson.Int("min", 1)
+				eitem.Max = ejson.Int("max", 8192)
 			}
 
 			if eitem.Min < 1 {
@@ -370,11 +370,11 @@ func GetVItem(name string, ejson *DJSON) *VItem {
 
 		case "ARRAY":
 			if ejson.IsInt("size") {
-				eitem.Min = ejson.GetAsInt("size")
+				eitem.Min = ejson.Int("size")
 				eitem.Max = eitem.Min
 			} else {
-				eitem.Min = ejson.GetAsInt("min", 0)
-				eitem.Max = ejson.GetAsInt("max", int64(9007199254740991))
+				eitem.Min = ejson.Int("min", 0)
+				eitem.Max = ejson.Int("max", int64(9007199254740991))
 			}
 
 			if eitem.Min < 0 {
@@ -383,11 +383,11 @@ func GetVItem(name string, ejson *DJSON) *VItem {
 
 		case "NONEMPTY.ARRAY":
 			if ejson.IsInt("size") {
-				eitem.Min = ejson.GetAsInt("size")
+				eitem.Min = ejson.Int("size")
 				eitem.Max = eitem.Min
 			} else {
-				eitem.Min = ejson.GetAsInt("min", 1)
-				eitem.Max = ejson.GetAsInt("max", int64(9007199254740991))
+				eitem.Min = ejson.Int("min", 1)
+				eitem.Max = ejson.Int("max", int64(9007199254740991))
 			}
 
 			if eitem.Min < 1 {
@@ -406,17 +406,17 @@ func GetVItem(name string, ejson *DJSON) *VItem {
 		if etype == "BIN" || etype == "DEC" || etype == "HEX" {
 			eitem.Type = V_TYPE_STRING
 			if ejson.IsInt("size") {
-				eitem.Min = ejson.GetAsInt("size")
+				eitem.Min = ejson.Int("size")
 				eitem.Max = eitem.Min
 			} else {
-				eitem.Min = ejson.GetAsInt("min", 0)
-				eitem.Max = ejson.GetAsInt("max", 8192)
+				eitem.Min = ejson.Int("min", 0)
+				eitem.Max = ejson.Int("max", 8192)
 			}
 		}
 
 		if etype == "ARRAY" || etype == "NONEMPTY.ARRAY" {
 			eitem.Type = V_TYPE_ARRAY
-			eitem.Max = ejson.GetAsInt("max", int64(9007199254740991))
+			eitem.Max = ejson.Int("max", int64(9007199254740991))
 			oa, ok := ejson.Get("array") // type of element
 			if ok {
 				eitem.SubItems = make([]*VItem, 0)
@@ -528,7 +528,7 @@ func GetVItem(name string, ejson *DJSON) *VItem {
 	return eitem
 }
 
-func (m *Validator) IsValid(tjson *DJSON) bool {
+func (m *Validator) IsValid(tjson *JSON) bool {
 	if tjson == nil {
 		return len(m.RootItems) == 0
 	}
@@ -560,7 +560,7 @@ func (m *Validator) IsValid(tjson *DJSON) bool {
 
 }
 
-func CheckVItem(vi *VItem, tjson *DJSON) bool {
+func CheckVItem(vi *VItem, tjson *JSON) bool {
 	if vi.Name == "" {
 		return false
 	}
@@ -568,9 +568,9 @@ func CheckVItem(vi *VItem, tjson *DJSON) bool {
 	var vtype string
 
 	if vi.Name == "__root__" || vi.Name == "__array__" {
-		vtype = tjson.GetType()
+		vtype = tjson.Type()
 	} else {
-		vtype = tjson.GetType(vi.Name)
+		vtype = tjson.Type(vi.Name)
 	}
 
 	//log.Println("CheckVItem ", vi.Name, " ", vtype, " ", vi.Type, " ", tjson.ToString())
@@ -588,9 +588,9 @@ func CheckVItem(vi *VItem, tjson *DJSON) bool {
 		var si int64
 
 		if vi.Name == "__root__" || vi.Name == "__array__" {
-			si = tjson.GetAsInt()
+			si = tjson.Int()
 		} else {
-			si = tjson.GetAsInt(vi.Name)
+			si = tjson.Int(vi.Name)
 		}
 
 		if vi.Max < si || vi.Min > si {
@@ -612,9 +612,9 @@ func CheckVItem(vi *VItem, tjson *DJSON) bool {
 		var sf float64
 
 		if vi.Name == "__root__" || vi.Name == "__array__" {
-			sf = tjson.GetAsFloat()
+			sf = tjson.Float()
 		} else {
-			sf = tjson.GetAsFloat(vi.Name)
+			sf = tjson.Float(vi.Name)
 		}
 
 		if vi.MaxFloat < sf || vi.MinFloat > sf {
@@ -628,9 +628,9 @@ func CheckVItem(vi *VItem, tjson *DJSON) bool {
 		var ss string
 
 		if vi.Name == "__root__" || vi.Name == "__array__" {
-			ss = tjson.GetAsString()
+			ss = tjson.String()
 		} else {
-			ss = tjson.GetAsString(vi.Name)
+			ss = tjson.String(vi.Name)
 		}
 
 		lenv := int64(len(ss))
@@ -652,16 +652,16 @@ func CheckVItem(vi *VItem, tjson *DJSON) bool {
 			return false
 		}
 
-		var so *DJSON
+		var so *JSON
 		var ok bool
 
 		if vi.Name == "__root__" || vi.Name == "__array__" {
-			so, ok = tjson.GetAsObject()
+			so, ok = tjson.Object()
 			if !ok {
 				return false
 			}
 		} else {
-			so, ok = tjson.GetAsObject(vi.Name)
+			so, ok = tjson.Object(vi.Name)
 		}
 
 		if vi.IsRequred && !ok {
@@ -683,16 +683,16 @@ func CheckVItem(vi *VItem, tjson *DJSON) bool {
 			return false
 		}
 
-		var sa *DJSON
+		var sa *JSON
 		var ok bool
 
 		if vi.Name == "__root__" || vi.Name == "__array__" {
-			sa, ok = tjson.GetAsArray()
+			sa, ok = tjson.Array()
 			if !ok {
 				return false
 			}
 		} else {
-			sa, ok = tjson.GetAsArray(vi.Name)
+			sa, ok = tjson.Array(vi.Name)
 		}
 
 		if vi.IsRequred && !ok {
@@ -703,7 +703,7 @@ func CheckVItem(vi *VItem, tjson *DJSON) bool {
 			return true
 		}
 
-		lenv := int64(sa.Length())
+		lenv := int64(sa.Len())
 		if lenv > vi.Max || lenv < vi.Min {
 			return false
 		}

@@ -25,14 +25,14 @@ func TestGetType(t *testing.T) {
 		}
 	]`
 
-	mJson := NewDJSON().Parse(jsonDoc)
+	mJson := New().Parse(jsonDoc)
 
-	log.Println(mJson.GetType())
-	log.Println(mJson.GetType(1))
+	log.Println(mJson.Type())
+	log.Println(mJson.Type(1))
 	log.Println(mJson.IsObject(1))
-	log.Println(mJson.GetTypePath(`[1]["name"]`))
-	log.Println(mJson.GetTypePath(`[1]["idade"]`))
-	log.Println(mJson.GetTypePath(`[1]["skills"]`))
+	log.Println(mJson.TypePath(`[1]["name"]`))
+	log.Println(mJson.TypePath(`[1]["idade"]`))
+	log.Println(mJson.TypePath(`[1]["skills"]`))
 
-	log.Println(mJson.GetAsFloat(1, 0.7))
+	log.Println(mJson.Float(1, 0.7))
 }

@@ -14,7 +14,7 @@ type DA struct {
 	Element     []interface{}
 }
 
-func NewArray() *DA {
+func NewDA() *DA {
 	return &DA{
 		Element: make([]interface{}, 0),
 	}
@@ -102,17 +102,17 @@ func (m *DA) ReplaceAt(idx int, value interface{}) *DA {
 	case DO:
 		m.Element[idx] = &t
 	case map[string]interface{}:
-		m.Element[idx] = ConverMapToObject(t)
+		m.Element[idx] = MapToObject(t)
 	case []interface{}:
-		m.Element[idx] = ConvertSliceToArray(t)
+		m.Element[idx] = SliceToArray(t)
 	case Object:
-		m.Element[idx] = ConverMapToObject(t)
+		m.Element[idx] = MapToObject(t)
 	case Array:
-		m.Element[idx] = ConvertSliceToArray(t)
-	case DJSON:
-		m.Element[idx] = t.GetAsInterface()
-	case *DJSON:
-		m.Element[idx] = t.GetAsInterface()
+		m.Element[idx] = SliceToArray(t)
+	case JSON:
+		m.Element[idx] = t.Interface()
+	case *JSON:
+		m.Element[idx] = t.Interface()
 	case nil:
 		m.Element[idx] = nil
 	}
@@ -414,7 +414,7 @@ func (m *DA) GetAsString(idx int) string {
 	return ""
 }
 
-func (m *DA) GetAsString2(idx int) (string, bool) {
+func (m *DA) String2(idx int) (string, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return "", false
 	}
@@ -436,12 +436,12 @@ func (m *DA) GetAsString2(idx int) (string, bool) {
 }
 
 func (m *DA) ToStringPretty() string {
-	jsonByte, _ := json.MarshalIndent(ConvertArrayToSlice(m), "", "   ")
+	jsonByte, _ := json.MarshalIndent(ArrayToSlice(m), "", "   ")
 	return string(jsonByte)
 }
 
 func (m *DA) ToString() string {
-	jsonByte, _ := json.Marshal(ConvertArrayToSlice(m))
+	jsonByte, _ := json.Marshal(ArrayToSlice(m))
 	return string(jsonByte)
 }
 
@@ -485,8 +485,8 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 			switch elemType {
 			case "string":
 
-				iRune := []rune(ido.GetAsString(key))
-				jRune := []rune(jdo.GetAsString(key))
+				iRune := []rune(ido.String(key))
+				jRune := []rune(jdo.String(key))
 
 				lenToInspect := len(iRune)
 				if len(jRune) < lenToInspect {
@@ -532,8 +532,8 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 			switch elemType {
 			case "string":
 
-				iRune := []rune(ido.GetAsString(key))
-				jRune := []rune(jdo.GetAsString(key))
+				iRune := []rune(ido.String(key))
+				jRune := []rune(jdo.String(key))
 
 				lenToInspect := len(iRune)
 				if len(jRune) < lenToInspect {
@@ -727,8 +727,8 @@ func (m *DA) Equal(t *DA) bool {
 				return false
 			}
 		case "*djson.DJSON":
-			mjson := m.Element[i].(*DJSON)
-			tjson := t.Element[i].(*DJSON)
+			mjson := m.Element[i].(*JSON)
+			tjson := t.Element[i].(*JSON)
 
 			if !mjson.Equal(tjson) {
 				return false
@@ -741,7 +741,7 @@ func (m *DA) Equal(t *DA) bool {
 
 func (m *DA) Clone() *DA {
 
-	t := NewArray()
+	t := NewDA()
 
 	t.Element = make([]interface{}, m.Size())
 
@@ -768,7 +768,7 @@ func (m *DA) Clone() *DA {
 			mda := m.Element[i].(*DA)
 			t.Element[i] = mda.Clone()
 		case "*djson.DJSON":
-			mdjson := m.Element[i].(*DJSON)
+			mdjson := m.Element[i].(*JSON)
 			t.Element[i] = mdjson.Clone()
 		}
 	}

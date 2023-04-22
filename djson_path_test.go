@@ -24,7 +24,7 @@ func TestPutPath(t *testing.T) {
 		}
 	]`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 
 	err := aJson.UpdatePath(`[1]["name"]`, Object{
 		"first":  "kim",
@@ -34,42 +34,42 @@ func TestPutPath(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 
 	err = aJson.UpdatePath(`[1]["name"]["first"]`, "seo")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 
 	err = aJson.PushBackPath(`[1]["skills"]`, "kotlin")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 
 	err = aJson.RemovePath(`[1]["name"]["family"]`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 
 	err = aJson.RemovePath(`[1]["name"]`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 
 	err = aJson.RemovePath(`[1]`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 }
 
 func TestGetAsArrayObjectPath(t *testing.T) {
@@ -91,20 +91,20 @@ func TestGetAsArrayObjectPath(t *testing.T) {
 		] 
 	  }`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 
 	aJson.UpdatePath(`[medicines][2]`, "010-1234-5665")
 
 	log.Println(aJson.ToString())
 
-	dJson, ok := aJson.GetAsArray("medicines")
+	dJson, ok := aJson.Array("medicines")
 	if !ok {
 		log.Fatal("GetAsArray() failed")
 	}
 
 	log.Println(dJson.ToString())
 
-	pJson, ok := dJson.GetAsArrayPath(`[0]["dose_event"]`)
+	pJson, ok := dJson.ArrayPath(`[0]["dose_event"]`)
 	if !ok {
 		log.Fatal("GetAsArrayPath() failed")
 	}
@@ -131,12 +131,12 @@ func TestGetKeysPath(t *testing.T) {
 		] 
 	  }`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 
 	log.Println(aJson.GetKeys("hospital"))
 	log.Println(aJson.GetKeys("medicines"))
-	log.Println(aJson.GetKeysPath(`[hospital]`))
-	log.Println(aJson.GetKeysPath(`[medicines][0][dose_event][0]`))
+	log.Println(aJson.KeysPath(`[hospital]`))
+	log.Println(aJson.KeysPath(`[medicines][0][dose_event][0]`))
 
 }
 
@@ -146,7 +146,7 @@ func TestUpdatePath2(t *testing.T) {
 		"name" :"222"
 	}]`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 	bJson := aJson.Clone()
 
 	aJson.UpdatePath(`[0]["xxx"]`, "xxxx")

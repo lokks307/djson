@@ -16,7 +16,7 @@ func TestToFieldTag(t *testing.T) {
 
 	var user User
 
-	mJson := NewDJSON().Put(
+	mJson := New().Put(
 		Object{
 			"id":    "id-1234",
 			"name":  "Ricardo Longa",
@@ -45,7 +45,7 @@ func TestFromFieldTag(t *testing.T) {
 		},
 	}
 
-	mJson := NewDJSON()
+	mJson := New()
 	mJson.FromFields(user)
 
 	log.Println(mJson.ToString())
@@ -71,21 +71,21 @@ func TestFromFieldMapTest(t *testing.T) {
 		Valid:  true,
 	}
 
-	mJson := NewDJSON()
+	mJson := New()
 	mJson.FromFields(user, "name.first", "email")
 
 	log.Println(mJson.ToString())
 }
 
 func TestSortingArray(t *testing.T) {
-	mJson := NewArrayJSON(5, 6, 7, 8, 1, 2, 3, 4)
+	mJson := NewArray(5, 6, 7, 8, 1, 2, 3, 4)
 	if ok := mJson.SortAsc(); !ok {
 		log.Fatal("sorting test failed")
 	}
 
 	log.Println(mJson.ToString())
 
-	tJson := NewDJSON().Put(Object{
+	tJson := New().Put(Object{
 		"d": "aaa",
 		"a": Array{
 			5, 6, 7, 8, 1, 2, 3, 4,
@@ -106,7 +106,7 @@ func TestSortingArray(t *testing.T) {
 
 	log.Println(tJson.ToString())
 
-	pJson := NewDJSON().Put(
+	pJson := New().Put(
 		Array{
 			Object{
 				"k": "1",
@@ -129,7 +129,7 @@ func TestSortingArray(t *testing.T) {
 
 	pJson.SortObjectArrayAsc("k")
 
-	p2Json := NewDJSON().Put(
+	p2Json := New().Put(
 		Object{
 			"kk": Array{
 				Object{
@@ -165,14 +165,14 @@ func TestSortingArray(t *testing.T) {
 
 func TestReflectType(t *testing.T) {
 
-	aJson := NewDJSON().Put(Object{
+	aJson := New().Put(Object{
 		"name": "yu",
 		"skill": Array{
 			"running", "playing",
 		},
 	})
 
-	bJson := NewDJSON().Put(Object{
+	bJson := New().Put(Object{
 		"skill": Array{
 			"running", "playing",
 		},
@@ -187,7 +187,7 @@ func TestReflectType(t *testing.T) {
 }
 
 func TestClone(t *testing.T) {
-	aJson := NewDJSON().Put(Object{
+	aJson := New().Put(Object{
 		"name": "yu",
 		"skill": Array{
 			"running", "playing",
@@ -198,7 +198,7 @@ func TestClone(t *testing.T) {
 
 	aJson.UpdatePath(`[skill][2]`, "swimming")
 
-	bJson.PutAsObject("name", "not you")
+	bJson.PutObject("name", "not you")
 	bJson.UpdatePath(`[skill][2]`, "studying")
 
 	log.Println(aJson.ToString())
@@ -206,7 +206,7 @@ func TestClone(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	aJson := NewDJSON().Put(Array{
+	aJson := New().Put(Array{
 		Object{
 			"name":  "1",
 			"skill": "apple",
@@ -228,7 +228,7 @@ func TestFind(t *testing.T) {
 }
 
 func TestAppend(t *testing.T) {
-	aJson := NewDJSON().Put(Array{
+	aJson := New().Put(Array{
 		Object{
 			"name":  "1",
 			"skill": "apple",
@@ -239,7 +239,7 @@ func TestAppend(t *testing.T) {
 		},
 	})
 
-	bJson := NewDJSON().Put(Array{
+	bJson := New().Put(Array{
 		Object{
 			"name":  "3",
 			"skill": "apple",
@@ -254,7 +254,7 @@ func TestAppend(t *testing.T) {
 }
 
 func TestCloneNil(t *testing.T) {
-	aJson := NewDJSON().Put(Array{
+	aJson := New().Put(Array{
 		Object{
 			"name":  nil,
 			"skill": "apple",

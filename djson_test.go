@@ -20,8 +20,8 @@ func TestParseJson(t *testing.T) {
 
 	obj, err := ParseToObject(jsonDoc)
 	if err == nil {
-		log.Println(obj.GetAsString("name"))
-		log.Println(obj.GetAsString("age"))
+		log.Println(obj.String("name"))
+		log.Println(obj.String("age"))
 		arr, ok := obj.GetAsArray("address")
 		if !ok {
 			log.Fatal("no such key")
@@ -56,7 +56,7 @@ func TestParseArray(t *testing.T) {
 		if !ok {
 			log.Fatal("no such index")
 		}
-		log.Println(obj.GetAsString("name"))
+		log.Println(obj.String("name"))
 	} else {
 		log.Fatal("not array")
 	}
@@ -82,19 +82,19 @@ func TestParseDJSON(t *testing.T) {
 		}
 	]`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 
-	bJson, ok := aJson.GetAsObject(1)
+	bJson, ok := aJson.Object(1)
 	if !ok {
 		log.Fatal("not object")
 	}
 
-	log.Println(bJson.GetAsInt("skills"))
-	log.Println(bJson.GetAsString())
+	log.Println(bJson.Int("skills"))
+	log.Println(bJson.String())
 }
 
 func TestPutDJSON(t *testing.T) {
-	aJson := NewDJSON().Put(
+	aJson := New().Put(
 		Array{
 			Object{
 				"name":  "Ricardo Longa",
@@ -115,19 +115,19 @@ func TestPutDJSON(t *testing.T) {
 		},
 	)
 
-	bJson, ok := aJson.GetAsObject(1)
+	bJson, ok := aJson.Object(1)
 	if !ok {
 		log.Fatal("not object")
 	}
 
-	log.Println(bJson.GetAsInt("skills"))
-	log.Println(bJson.GetAsString())
+	log.Println(bJson.Int("skills"))
+	log.Println(bJson.String())
 
 	log.Println(bJson.HasKey("name"))
 }
 
 func TestPutDArrayDJSON(t *testing.T) {
-	aJson := NewDJSON()
+	aJson := New()
 	aJson.Put(
 		Array{
 			Array{
@@ -144,14 +144,14 @@ func TestPutDArrayDJSON(t *testing.T) {
 		log.Fatal("not array")
 	}
 
-	log.Println(bJson.GetAsInt(1))
-	log.Println(bJson.GetAsString())
+	log.Println(bJson.Int(1))
+	log.Println(bJson.String())
 
 	log.Println(bJson.HasKey(1))
 }
 
 func TestArrayAppendDJSON(t *testing.T) {
-	aJson := NewDJSON()
+	aJson := New()
 	aJson.Put(
 		Array{
 			1, 2, 3, 4,
@@ -163,11 +163,11 @@ func TestArrayAppendDJSON(t *testing.T) {
 		},
 	)
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 }
 
 func TestObjectAppendDJSON(t *testing.T) {
-	aJson := NewDJSON()
+	aJson := New()
 	aJson.Put(
 		Object{
 			"name": "Hery Victor",
@@ -181,7 +181,7 @@ func TestObjectAppendDJSON(t *testing.T) {
 
 	aJson.Put("not appended")
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 }
 
 func TestUpdateDJSON(t *testing.T) {
@@ -203,9 +203,9 @@ func TestUpdateDJSON(t *testing.T) {
 		}
 	]`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 
-	bJson, ok := aJson.GetAsObject(1)
+	bJson, ok := aJson.Object(1)
 	if !ok {
 		log.Fatal("not object")
 	}
@@ -213,7 +213,7 @@ func TestUpdateDJSON(t *testing.T) {
 	_ = bJson.UpdatePath(`["hobbies"][1]`, "running")
 	_ = bJson.UpdatePath(`["hobbies"][0]`, "art")
 
-	log.Println(aJson.GetAsString())
+	log.Println(aJson.String())
 }
 
 func TestHandleDJSON(t *testing.T) {
@@ -225,45 +225,45 @@ func TestHandleDJSON(t *testing.T) {
 		]
 	}`
 
-	mJson := NewDJSON().Parse(jsonDoc)
+	mJson := New().Parse(jsonDoc)
 
-	aJson := NewDJSON()
+	aJson := New()
 	// aJson.Put("name", mJson.GetAsInterface("name"))
 	// aJson.Put("idade", mJson.GetAsInterface("idade"))
 
-	aJson.PutAsObject("name", mJson.GetAsInterface("name"))
-	aJson.PutAsObject("idade", mJson.GetAsInterface("idade"))
+	aJson.PutObject("name", mJson.Interface("name"))
+	aJson.PutObject("idade", mJson.Interface("idade"))
 
 	log.Println(aJson.ToString())
 
 }
 
 func TestFastDeclare(t *testing.T) {
-	dJson := NewObjectJSON(
+	dJson := NewObject(
 		"key", "value", "key2", "value2",
 	)
 
 	log.Println(dJson.ToString())
 
-	aJson := NewArrayJSON(
+	aJson := NewArray(
 		1, 2, 3, 4, 5, 6, 7,
 	)
 
 	log.Println(aJson.ToString())
 
-	tJson := NewDJSON(JSON_ARRAY)
+	tJson := New(ARRAY)
 	tJson.Put(1)
 
 	log.Println(tJson.ToString())
 
-	pJson := NewDJSON()
+	pJson := New()
 	pJson.Put(1)
 
 	log.Println(pJson.ToString())
 }
 
 func TestWrapArray(t *testing.T) {
-	mJson := NewDJSON(JSON_ARRAY)
+	mJson := New(ARRAY)
 
 	bb := []int{1, 2, 3, 4, 5, 6, 7, 8}
 
@@ -280,7 +280,7 @@ func TestSeekNext(t *testing.T) {
 		3,4
 	]`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 
 	bJson := aJson.Next()
 	if bJson == nil {
@@ -308,12 +308,12 @@ func TestFloat(t *testing.T) {
 
 	jsonDoc := `{"number": "NaN"}`
 
-	aJson := NewDJSON().Parse(jsonDoc)
+	aJson := New().Parse(jsonDoc)
 
 	log.Println(aJson.ToString())
 
-	bJson := NewDJSON(JSON_OBJECT)
-	bJson.Put("number", aJson.GetAsFloat("number"))
+	bJson := New(OBJECT)
+	bJson.Put("number", aJson.Float("number"))
 	bJson.Put("number2", 1)
 
 	log.Println(bJson.ToString())
