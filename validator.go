@@ -211,7 +211,9 @@ func (m *Validator) Compile(syntax string) bool {
 
 	} else if m.Syntax.IsArray() {
 		m.Syntax.Seek()
-		for es := m.Syntax.Next(); es != nil; es = m.Syntax.Next() {
+
+		for m.Syntax.Next() {
+			es := m.Syntax.Scan()
 			vi := GetVItem("__root__", es)
 			if vi != nil {
 				m.RootItems = append(m.RootItems, vi)
@@ -288,7 +290,8 @@ func GetVItem(name string, ejson *JSON) *VItem {
 
 		eitem.Type = V_TYPE_MULTI
 		ejson.Seek()
-		for es := ejson.Next(); es != nil; es = ejson.Next() {
+		for ejson.Next() {
+			es := ejson.Scan()
 			vi := GetVItem(name, es)
 			if vi != nil {
 				eitem.SubItems = append(eitem.SubItems, vi)
@@ -422,7 +425,8 @@ func GetVItem(name string, ejson *JSON) *VItem {
 				eitem.SubItems = make([]*VItem, 0)
 				if oa.IsArray() {
 					oa.Seek()
-					for es := oa.Next(); es != nil; es = oa.Next() {
+					for oa.Next() {
+						es := oa.Scan()
 						vi := GetVItem("__array__", es)
 						if vi != nil {
 							eitem.SubItems = append(eitem.SubItems, vi)
@@ -714,7 +718,8 @@ func CheckVItem(vi *VItem, tjson *JSON) bool {
 			}
 
 			sa.Seek() // valid element type
-			for ssa := sa.Next(); ssa != nil; ssa = sa.Next() {
+			for sa.Next() {
+				ssa := sa.Scan()
 				isValid := false
 				for _, svi := range vi.SubItems {
 					if CheckVItem(svi, ssa) {

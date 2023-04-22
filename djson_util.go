@@ -17,11 +17,11 @@ func (m *JSON) Len() int {
 	}
 
 	if m._Type == ARRAY {
-		return m._Array.Length()
+		return m._Array.Len()
 	}
 
 	if m._Type == OBJECT {
-		return m._Object.Length()
+		return m._Object.Len()
 	}
 
 	return 1
@@ -411,63 +411,6 @@ func inTags(idv string, tags ...string) bool {
 	}
 
 	return false
-}
-
-func (m *JSON) doSort(isAsc bool, k ...interface{}) bool {
-	var tArray *DA
-
-	if len(k) == 0 {
-		if m._Type == ARRAY {
-			tArray = m._Array
-		}
-	}
-
-	if len(k) > 0 {
-
-		if m._Type == OBJECT {
-			if key, ok := k[0].(string); ok {
-				if da, ok := m._Object.GetAsArray(key); ok {
-					tArray = da
-				}
-			}
-		} else if m._Type == ARRAY {
-			if idx, ok := k[0].(int); ok {
-				if da, ok := m._Array.GetAsArray(idx); ok {
-					tArray = da
-				}
-			}
-		}
-	}
-
-	if tArray != nil {
-		return tArray.Sort(isAsc)
-	} else {
-		return false
-	}
-}
-
-func (m *JSON) SortAsc(k ...interface{}) bool {
-	return m.doSort(true, k...)
-}
-
-func (m *JSON) SortDesc(k ...interface{}) bool {
-	return m.doSort(false, k...)
-}
-
-func (m *JSON) SortObjectArray(isAsc bool, key string) bool {
-	if m._Type != ARRAY {
-		return false
-	}
-
-	return m._Array.SortObject(isAsc, key)
-}
-
-func (m *JSON) SortObjectArrayAsc(key string) bool {
-	return m.SortObjectArray(true, key)
-}
-
-func (m *JSON) SortObjectArrayDesc(key string) bool {
-	return m.SortObjectArray(false, key)
 }
 
 func (m *JSON) Equal(t *JSON) bool {

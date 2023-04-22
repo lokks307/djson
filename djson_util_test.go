@@ -98,9 +98,9 @@ func TestSortingArray(t *testing.T) {
 
 	log.Println(tJson.ToString())
 
-	err := tJson.SortDescPath(`["a"]`)
+	ok := tJson.SortDescPath(`["a"]`)
 
-	if err != nil {
+	if !ok {
 		log.Fatal("sorting path failed")
 	}
 
@@ -127,7 +127,7 @@ func TestSortingArray(t *testing.T) {
 		},
 	)
 
-	pJson.SortObjectArrayAsc("k")
+	pJson.SortArrayAsc("k")
 
 	p2Json := New().Put(
 		Object{
@@ -156,7 +156,7 @@ func TestSortingArray(t *testing.T) {
 		},
 	)
 
-	p2Json.SortObjectArrayDescPath(`[kk]`, "k")
+	p2Json.SortDescPath(`[kk]`, "k")
 
 	log.Println(pJson.ToString())
 	log.Println(p2Json.ToString())

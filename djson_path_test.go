@@ -26,47 +26,47 @@ func TestPutPath(t *testing.T) {
 
 	aJson := New().Parse(jsonDoc)
 
-	err := aJson.UpdatePath(`[1]["name"]`, Object{
+	ok := aJson.UpdatePath(`[1]["name"]`, Object{
 		"first":  "kim",
 		"family": "kim",
 	})
-	if err != nil {
-		log.Fatal(err)
+	if !ok {
+		log.Fatal("")
 	}
 
 	log.Println(aJson.String())
 
-	err = aJson.UpdatePath(`[1]["name"]["first"]`, "seo")
-	if err != nil {
-		log.Fatal(err)
+	ok = aJson.UpdatePath(`[1]["name"]["first"]`, "seo")
+	if !ok {
+		log.Fatal("")
 	}
 
 	log.Println(aJson.String())
 
-	err = aJson.PushBackPath(`[1]["skills"]`, "kotlin")
-	if err != nil {
-		log.Fatal(err)
+	ok = aJson.PushBackToPath(`[1]["skills"]`, "kotlin")
+	if !ok {
+		log.Fatal("")
 	}
 
 	log.Println(aJson.String())
 
-	err = aJson.RemovePath(`[1]["name"]["family"]`)
-	if err != nil {
-		log.Fatal(err)
+	ok = aJson.RemovePath(`[1]["name"]["family"]`)
+	if !ok {
+		log.Fatal("")
 	}
 
 	log.Println(aJson.String())
 
-	err = aJson.RemovePath(`[1]["name"]`)
-	if err != nil {
-		log.Fatal(err)
+	ok = aJson.RemovePath(`[1]["name"]`)
+	if !ok {
+		log.Fatal("")
 	}
 
 	log.Println(aJson.String())
 
-	err = aJson.RemovePath(`[1]`)
-	if err != nil {
-		log.Fatal(err)
+	ok = aJson.RemovePath(`[1]`)
+	if !ok {
+		log.Fatal("")
 	}
 
 	log.Println(aJson.String())
@@ -75,31 +75,35 @@ func TestPutPath(t *testing.T) {
 func TestGetAsArrayObjectPath(t *testing.T) {
 	jsonDoc := `{
 		"hospital":{
-		  "hospital_name":"록스병원",
-		  "doctor_name":"김의사",
-		  "department":"신경과"
+			"hospital_name":"록스병원",
+			"doctor_name":"김의사",
+			"department":"신경과"
 		},
-		"medicines": [ {
-		  "name": "타이레놀",
-		  "dose_event" : [
+		"medicines": [
 			{
-			  "date" : "2021-02-02",
-			  "time" : ["#B+30","#L+60"]
+				"name": "타이레놀",
+				"dose_event" : [
+					{
+						"date" : "2021-02-02",
+						"time" : ["#B+30","#L+60"]
+					}
+				]
 			}
-		  ]
-		}
 		] 
 	  }`
 
 	aJson := New().Parse(jsonDoc)
 
-	aJson.UpdatePath(`[medicines][2]`, "010-1234-5665")
+	pok := aJson.UpdatePath(`[medicines][0][dose_event][0][date]`, "2021-02-03")
+	if !pok {
+		log.Fatal("UpdatePath is not valid")
+	}
 
 	log.Println(aJson.ToString())
 
 	dJson, ok := aJson.Array("medicines")
 	if !ok {
-		log.Fatal("GetAsArray() failed")
+		log.Fatal("Array() failed")
 	}
 
 	log.Println(dJson.ToString())
@@ -119,15 +123,16 @@ func TestGetKeysPath(t *testing.T) {
 		  "doctor_name":"김의사",
 		  "department":"신경과"
 		},
-		"medicines": [ {
-		  "name": "타이레놀",
-		  "dose_event" : [
+		"medicines": [
 			{
-			  "date" : "2021-02-02",
-			  "time" : ["#B+30","#L+60"]
+				"name": "타이레놀",
+				"dose_event" : [
+					{
+						"date" : "2021-02-02",
+						"time" : ["#B+30","#L+60"]
+					}
+				]
 			}
-		  ]
-		}
 		] 
 	  }`
 

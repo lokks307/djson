@@ -108,7 +108,7 @@ func (m *DO) Put(key string, value interface{}) *DO {
 	return m
 }
 
-func (m *DO) PutAsArray(key string, array ...interface{}) *DO {
+func (m *DO) PutArray(key string, array ...interface{}) *DO {
 	nArray := NewDA()
 	nArray.Put(array)
 	m.Put(key, nArray)
@@ -189,7 +189,7 @@ func (m *DO) Get(key string) (interface{}, bool) {
 	return value, true
 }
 
-func (m *DO) GetType(key string) (string, bool) {
+func (m *DO) Type(key string) (string, bool) {
 	value, ok := m.Map[key]
 	if !ok {
 		return "", false
@@ -215,7 +215,7 @@ func (m *DO) GetType(key string) (string, bool) {
 	return "", false
 }
 
-func (m *DO) GetAsBool(key string) (bool, bool) {
+func (m *DO) Bool(key string) (bool, bool) {
 	value, ok := m.Map[key]
 	if !ok {
 		return false, false
@@ -228,7 +228,7 @@ func (m *DO) GetAsBool(key string) (bool, bool) {
 	return false, false
 }
 
-func (m *DO) GetAsFloat(key string) (float64, bool) {
+func (m *DO) Float(key string) (float64, bool) {
 	value, ok := m.Map[key]
 	if !ok {
 		return 0, false
@@ -241,7 +241,7 @@ func (m *DO) GetAsFloat(key string) (float64, bool) {
 	return 0, false
 }
 
-func (m *DO) GetAsInt(key string) (int64, bool) {
+func (m *DO) Int(key string) (int64, bool) {
 	value, ok := m.Map[key]
 	if !ok {
 		return 0, false
@@ -254,7 +254,7 @@ func (m *DO) GetAsInt(key string) (int64, bool) {
 	return 0, false
 }
 
-func (m *DO) GetAsObject(key string) (*DO, bool) {
+func (m *DO) Object(key string) (*DO, bool) {
 	value, ok := m.Map[key]
 	if !ok {
 		return nil, false
@@ -272,7 +272,7 @@ func (m *DO) GetAsObject(key string) (*DO, bool) {
 	return nil, false
 }
 
-func (m *DO) GetAsArray(key string) (*DA, bool) {
+func (m *DO) Array(key string) (*DA, bool) {
 
 	value, ok := m.Map[key]
 	if !ok {
@@ -313,7 +313,7 @@ func (m *DO) ToString() string {
 	return string(jsonByte)
 }
 
-func (m *DO) Length() int {
+func (m *DO) Len() int {
 	return len(m.Map)
 }
 
@@ -342,42 +342,42 @@ func (m *DO) Equal(t *DO) bool {
 			return false
 		}
 
-		switch mtype {
-		case "string":
+		switch m.Map[i].(type) {
+		case string:
 			if m.Map[i].(string) != t.Map[i].(string) {
 				return false
 			}
-		case "bool":
+		case bool:
 			if m.Map[i].(bool) != t.Map[i].(bool) {
 				return false
 			}
-		case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-			mInt, _ := m.GetAsInt(i)
-			tInt, _ := t.GetAsInt(i)
+		case int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64:
+			mInt, _ := m.Int(i)
+			tInt, _ := t.Int(i)
 			if mInt != tInt {
 				return false
 			}
-		case "float32", "float64":
-			mFloat, _ := m.GetAsFloat(i)
-			tFloat, _ := t.GetAsFloat(i)
+		case float32, float64:
+			mFloat, _ := m.Float(i)
+			tFloat, _ := t.Float(i)
 			if mFloat != tFloat {
 				return false
 			}
-		case "*djson.DO":
+		case *DO:
 			mdo := m.Map[i].(*DO)
 			tdo := t.Map[i].(*DO)
 
 			if !mdo.Equal(tdo) {
 				return false
 			}
-		case "*djson.DA":
+		case *DA:
 			mda := m.Map[i].(*DA)
 			tda := t.Map[i].(*DA)
 
 			if !mda.Equal(tda) {
 				return false
 			}
-		case "*djson.DJSON":
+		case *JSON:
 			mjson := m.Map[i].(*JSON)
 			tjson := t.Map[i].(*JSON)
 
@@ -403,24 +403,22 @@ func (m *DO) Clone() *DO {
 			continue
 		}
 
-		mtype := reflect.TypeOf(m.Map[k]).String()
-
-		switch mtype {
-		case "string":
+		switch m.Map[k].(type) {
+		case string:
 			t.Map[k] = m.Map[k].(string)
-		case "bool":
+		case bool:
 			t.Map[k] = m.Map[k].(bool)
-		case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-			t.Map[k], _ = m.GetAsInt(k)
-		case "Map", "float64":
-			t.Map[k], _ = m.GetAsFloat(k)
-		case "*djson.DO":
+		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+			t.Map[k], _ = m.Int(k)
+		case float64:
+			t.Map[k], _ = m.Float(k)
+		case *DO:
 			mdo := m.Map[k].(*DO)
 			t.Map[k] = mdo.Clone()
-		case "*djson.DA":
+		case *DA:
 			mda := m.Map[k].(*DA)
 			t.Map[k] = mda.Clone()
-		case "*djson.DJSON":
+		case *JSON:
 			mdjson := m.Map[k].(*JSON)
 			t.Map[k] = mdjson.Clone()
 		}
