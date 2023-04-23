@@ -1,17 +1,17 @@
 package djson
 
-func (m *DJSON) getTypeSimple(key interface{}) string {
+func (m *JSON) getTypeSimple(key interface{}) string {
 
-	switch m.JsonType {
-	case JSON_OBJECT:
+	switch m._Type {
+	case OBJECT:
 		if key, tok := key.(string); tok {
-			if typeStr, ok := m.Object.GetType(key); ok {
+			if typeStr, ok := m._Object.Type(key); ok {
 				return typeStr
 			}
 		}
-	case JSON_ARRAY:
+	case ARRAY:
 		if idx, tok := key.(int); tok {
-			if typeStr, ok := m.Array.GetType(idx); ok {
+			if typeStr, ok := m._Array.Type(idx); ok {
 				return typeStr
 			}
 		}
@@ -20,91 +20,91 @@ func (m *DJSON) getTypeSimple(key interface{}) string {
 	return ""
 }
 
-func (m *DJSON) isSameType(key interface{}, inTypeStr string) bool {
+func (m *JSON) isSameType(key interface{}, inTypeStr string) bool {
 
 	return m.getTypeSimple(key) == inTypeStr
 }
 
-func (m *DJSON) IsBool(key ...interface{}) bool {
+func (m *JSON) IsBool(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_BOOL
+		return m._Type == BOOL
 	}
 
 	return m.isSameType(key[0], "bool")
 }
 
-func (m *DJSON) IsInt(key ...interface{}) bool {
+func (m *JSON) IsInt(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_INT
+		return m._Type == INT
 	}
 
 	return m.isSameType(key[0], "int")
 }
 
-func (m *DJSON) IsNumeric(key ...interface{}) bool {
+func (m *JSON) IsNumeric(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_FLOAT || m.JsonType == JSON_INT
+		return m._Type == FLOAT || m._Type == INT
 	}
 
 	return m.isSameType(key[0], "int") || m.isSameType(key[0], "float")
 }
 
-func (m *DJSON) IsFloat(key ...interface{}) bool {
+func (m *JSON) IsFloat(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_FLOAT
+		return m._Type == FLOAT
 	}
 
 	return m.isSameType(key[0], "float")
 }
 
-func (m *DJSON) IsString(key ...interface{}) bool {
+func (m *JSON) IsString(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_STRING
+		return m._Type == STRING
 	}
 
 	return m.isSameType(key[0], "string")
 }
 
-func (m *DJSON) IsNull(key ...interface{}) bool {
+func (m *JSON) IsNull(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_NULL
+		return m._Type == NULL
 	}
 
 	return m.isSameType(key[0], "null")
 }
 
-func (m *DJSON) IsObject(key ...interface{}) bool {
+func (m *JSON) IsObject(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_OBJECT
+		return m._Type == OBJECT
 	}
 
 	return m.isSameType(key[0], "object")
 }
 
-func (m *DJSON) IsArray(key ...interface{}) bool {
+func (m *JSON) IsArray(key ...interface{}) bool {
 	if IsEmptyArg(key) {
-		return m.JsonType == JSON_ARRAY
+		return m._Type == ARRAY
 	}
 
 	return m.isSameType(key[0], "array")
 }
 
-func (m *DJSON) GetType(key ...interface{}) string {
+func (m *JSON) Type(key ...interface{}) string {
 	if IsEmptyArg(key) {
-		switch m.JsonType {
-		case JSON_NULL:
+		switch m._Type {
+		case NULL:
 			return "null"
-		case JSON_OBJECT:
+		case OBJECT:
 			return "object"
-		case JSON_ARRAY:
+		case ARRAY:
 			return "array"
-		case JSON_STRING:
+		case STRING:
 			return "string"
-		case JSON_INT:
+		case INT:
 			return "int"
-		case JSON_FLOAT:
+		case FLOAT:
 			return "float"
-		case JSON_BOOL:
+		case BOOL:
 			return "bool"
 		}
 

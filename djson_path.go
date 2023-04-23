@@ -1,231 +1,193 @@
 package djson
 
-func (m *DJSON) GetAsObjectPath(path string) (*DJSON, bool) {
+func (m *JSON) ObjectPath(path string) (*JSON, bool) {
+	retJson := New()
 
-	retJson := NewDJSON()
-
-	err := m.DoPathFunc(path, nil,
+	pok := m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			if obj, ok := da.GetAsObject(idx); ok {
-				retJson.Object = obj
-				retJson.JsonType = JSON_OBJECT
+			if obj, ok := da.Object(idx); ok {
+				retJson._Object = obj
+				retJson._Type = OBJECT
 			}
 		},
 		func(do *DO, key string, v interface{}) {
-			if obj, ok := do.GetAsObject(key); ok {
-				retJson.Object = obj
-				retJson.JsonType = JSON_OBJECT
+			if obj, ok := do.Object(key); ok {
+				retJson._Object = obj
+				retJson._Type = OBJECT
 			}
 		},
 	)
 
-	if err != nil || retJson.JsonType != JSON_OBJECT {
+	if !pok || retJson._Type != OBJECT {
 		return nil, false
 	}
 
 	return retJson, true
 }
 
-func (m *DJSON) GetAsArrayPath(path string) (*DJSON, bool) {
+func (m *JSON) ArrayPath(path string) (*JSON, bool) {
+	retJson := New()
 
-	retJson := NewDJSON()
-
-	err := m.DoPathFunc(path, nil,
+	pok := m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			if arr, ok := da.GetAsArray(idx); ok {
-				retJson.Array = arr
-				retJson.JsonType = JSON_ARRAY
+			if arr, ok := da.Array(idx); ok {
+				retJson._Array = arr
+				retJson._Type = ARRAY
 			}
 		},
 		func(do *DO, key string, v interface{}) {
-			if arr, ok := do.GetAsArray(key); ok {
-				retJson.Array = arr
-				retJson.JsonType = JSON_ARRAY
+			if arr, ok := do.Array(key); ok {
+				retJson._Array = arr
+				retJson._Type = ARRAY
 			}
 		},
 	)
 
-	if err != nil || retJson.JsonType != JSON_ARRAY {
+	if !pok || retJson._Type != ARRAY {
 		return nil, false
 	}
 
 	return retJson, true
 }
 
-func (m *DJSON) GetAsFloatPath(path string, defFloat ...float64) float64 {
-	var retFloat float64
-	var ok bool
+func (m *JSON) FloatPath(path string, dv ...float64) float64 {
+	var ret float64
+	var kok bool
 
-	err := m.DoPathFunc(path, nil,
+	pok := m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			retFloat, ok = da.GetAsFloat(idx)
+			ret, kok = da.Float(idx)
 		},
 		func(do *DO, key string, v interface{}) {
-			retFloat, ok = do.GetAsFloat(key)
+			ret, kok = do.Float(key)
 		},
 	)
 
-	if err == nil && ok {
-		return retFloat
+	if pok && kok {
+		return ret
 	}
 
-	if len(defFloat) > 0 {
-		return defFloat[0]
+	if len(dv) > 0 {
+		return dv[0]
 	}
 
 	return 0
 }
 
-func (m *DJSON) GetAsIntPath(path string, defInt ...int64) int64 {
-	var retInt int64
-	var ok bool
+func (m *JSON) IntPath(path string, dv ...int64) int64 {
+	var ret int64
+	var kok bool
 
-	err := m.DoPathFunc(path, nil,
+	pok := m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			retInt, ok = da.GetAsInt(idx)
+			ret, kok = da.Int(idx)
 		},
 		func(do *DO, key string, v interface{}) {
-			retInt, ok = do.GetAsInt(key)
+			ret, kok = do.Int(key)
 		},
 	)
 
-	if err == nil && ok {
-		return retInt
+	if pok && kok {
+		return ret
 	}
 
-	if len(defInt) > 0 {
-		return defInt[0]
+	if len(dv) > 0 {
+		return dv[0]
 	}
 
 	return 0
 }
 
-func (m *DJSON) GetAsBoolPath(path string, defBool ...bool) bool {
+func (m *JSON) BoolPath(path string, dv ...bool) bool {
+	var ret bool
+	var kok bool
 
-	var retBool bool
-	var ok bool
-
-	err := m.DoPathFunc(path, nil,
+	pok := m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			retBool, ok = da.GetAsBool(idx)
+			ret, kok = da.Bool(idx)
 		},
 		func(do *DO, key string, v interface{}) {
-			retBool, ok = do.GetAsBool(key)
+			ret, kok = do.Bool(key)
 		},
 	)
 
-	if err == nil && ok {
-		return retBool
+	if pok && kok {
+		return ret
 	}
 
-	if len(defBool) > 0 {
-		return defBool[0]
+	if len(dv) > 0 {
+		return dv[0]
 	}
 
 	return false
 }
 
-func (m *DJSON) GetAsStringPath(path string) string {
-	var retStr string
+func (m *JSON) StringPath(path string) string {
+	var ret string
 
 	_ = m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			retStr = da.GetAsString(idx)
+			ret = da.String(idx)
 		},
 		func(do *DO, key string, v interface{}) {
-			retStr = do.GetAsString(key)
+			ret = do.String(key)
 		},
 	)
 
-	return retStr
+	return ret
 }
 
-func (m *DJSON) GetTypePath(path string) string {
+func (m *JSON) TypePath(path string) string {
 	var pathType string
 
 	_ = m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			pathType, _ = da.GetType(idx)
+			pathType, _ = da.Type(idx)
 		},
 		func(do *DO, key string, v interface{}) {
-			pathType, _ = do.GetType(key)
+			pathType, _ = do.Type(key)
 		},
 	)
 
 	return pathType
 }
 
-func (m *DJSON) SortObjectArrayPath(path string, isAsc bool, okey string) error {
+func (m *JSON) SortAscPath(path string, k ...string) bool {
+	return m.SortPath(path, true, k...)
+}
+
+func (m *JSON) SortDescPath(path string, k ...string) bool {
+	return m.SortPath(path, false, k...)
+}
+
+func (m *JSON) SortPath(path string, isAsc bool, k ...string) bool {
 	var isSorted bool
 
-	err := m.DoPathFunc(path, nil,
+	pok := m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			if tda, ok := da.GetAsArray(idx); ok {
-				isSorted = tda.SortObject(isAsc, okey)
+			if tda, ok := da.Array(idx); ok {
+				isSorted = tda.Sort(isAsc, k...)
 			} else {
 				isSorted = false
 			}
 		},
 		func(do *DO, key string, v interface{}) {
-			if tda, ok := do.GetAsArray(key); ok {
-				isSorted = tda.SortObject(isAsc, okey)
+			if tda, ok := do.Array(key); ok {
+				isSorted = tda.Sort(isAsc, k...)
 			} else {
 				isSorted = false
 			}
 		},
 	)
 
-	if err != nil || !isSorted {
-		return failedToSortError
+	if !pok || !isSorted {
+		return false
 	} else {
-		return nil
+		return true
 	}
 }
 
-func (m *DJSON) SortObjectArrayAscPath(path string, key string) error {
-	return m.SortObjectArrayPath(path, true, key)
-}
-
-func (m *DJSON) SortObjectArrayDescPath(path string, key string) error {
-	return m.SortObjectArrayPath(path, false, key)
-}
-
-func (m *DJSON) SortPath(path string, isAsc bool) error {
-	var isSorted bool
-
-	err := m.DoPathFunc(path, nil,
-		func(da *DA, idx int, v interface{}) {
-			if tda, ok := da.GetAsArray(idx); ok {
-				isSorted = tda.Sort(isAsc)
-			} else {
-				isSorted = false
-			}
-		},
-		func(do *DO, key string, v interface{}) {
-			if tda, ok := do.GetAsArray(key); ok {
-				isSorted = tda.Sort(isAsc)
-			} else {
-				isSorted = false
-			}
-		},
-	)
-
-	if err != nil || !isSorted {
-		return failedToSortError
-	} else {
-		return nil
-	}
-}
-
-func (m *DJSON) SortDescPath(path string) error {
-	return m.SortPath(path, false)
-}
-
-func (m *DJSON) SortAscPath(path string) error {
-	return m.SortPath(path, true)
-}
-
-func (m *DJSON) RemovePath(path string) error {
+func (m *JSON) RemovePath(path string) bool {
 	return m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
 			da.Remove(idx)
@@ -236,7 +198,7 @@ func (m *DJSON) RemovePath(path string) error {
 	)
 }
 
-func (m *DJSON) PutNewObjectPath(path string, okey string, oval interface{}) error {
+func (m *JSON) PutObjectToPath(path string, okey string, oval interface{}) bool {
 	return m.DoPathFunc(path, oval,
 		func(da *DA, idx int, v interface{}) {
 			da.Insert(idx, Object{okey: v})
@@ -249,7 +211,7 @@ func (m *DJSON) PutNewObjectPath(path string, okey string, oval interface{}) err
 
 // Replace or insert values as array
 
-func (m *DJSON) PutNewArrayPath(path string, val ...interface{}) error {
+func (m *JSON) PutArrayToPath(path string, val ...interface{}) bool {
 	return m.DoPathFunc(path, val,
 		func(da *DA, idx int, v interface{}) {
 			da.Insert(idx, v)
@@ -263,15 +225,15 @@ func (m *DJSON) PutNewArrayPath(path string, val ...interface{}) error {
 // Pushback a value to array if possible.
 // The path must indicate array.
 
-func (m *DJSON) PushBackPath(path string, val interface{}) error {
+func (m *JSON) PushBackToPath(path string, val interface{}) bool {
 	return m.DoPathFunc(path, val,
 		func(da *DA, idx int, v interface{}) {
-			if dda, ok := da.GetAsArray(idx); ok {
+			if dda, ok := da.Array(idx); ok {
 				dda.PushBack(v)
 			}
 		},
 		func(do *DO, key string, v interface{}) {
-			if dda, ok := do.GetAsArray(key); ok {
+			if dda, ok := do.Array(key); ok {
 				dda.PushBack(v)
 			}
 		},
@@ -280,7 +242,7 @@ func (m *DJSON) PushBackPath(path string, val interface{}) error {
 
 // Replace or insert a value
 
-func (m *DJSON) UpdatePath(path string, val interface{}) error {
+func (m *JSON) UpdatePath(path string, val interface{}) bool {
 	return m.DoPathFunc(path, val,
 		func(da *DA, idx int, v interface{}) {
 			da.ReplaceAt(idx, v)
@@ -291,48 +253,48 @@ func (m *DJSON) UpdatePath(path string, val interface{}) error {
 	)
 }
 
-func (m *DJSON) doPathFuncCore(
+func (m *JSON) doPathFuncCore(
 	arrayTaskFunc func(da *DA, idx int, v interface{}),
 	objectTaskFunc func(do *DO, key string, v interface{}),
-	val interface{}, token ...interface{}) error {
+	val interface{}, token ...interface{}) bool {
 
-	jsonMode := m.JsonType
-	dObject := m.Object
-	dArray := m.Array
+	jsonMode := m._Type
+	dObject := m._Object
+	dArray := m._Array
 
 	tokenLen := len(token)
 
 	for idx := range token {
 		switch tkey := token[idx].(type) {
 		case string:
-			if jsonMode != JSON_OBJECT || dObject == nil {
-				return invalidPathError
+			if jsonMode != OBJECT || dObject == nil {
+				return false
 			}
 
 			if idx == tokenLen-1 {
 				objectTaskFunc(dObject, tkey, val)
-				return nil
+				return true
 			} else {
 				if _, ok := dObject.Map[tkey]; !ok {
-					return invalidPathError
+					return false
 				}
 
 				switch t := dObject.Map[tkey].(type) {
 				case *DO:
 					dObject = t
 					dArray = nil
-					jsonMode = JSON_OBJECT
+					jsonMode = OBJECT
 				case *DA:
 					dObject = nil
 					dArray = t
-					jsonMode = JSON_ARRAY
+					jsonMode = ARRAY
 				default:
-					return invalidPathError
+					return false
 				}
 			}
 		case int:
-			if jsonMode != JSON_ARRAY || dArray == nil {
-				return invalidPathError
+			if jsonMode != ARRAY || dArray == nil {
+				return false
 			}
 
 			for dArray.Size() < tkey {
@@ -341,49 +303,49 @@ func (m *DJSON) doPathFuncCore(
 
 			if idx == tokenLen-1 {
 				arrayTaskFunc(dArray, tkey, val)
-				return nil
+				return true
 			} else {
 				switch t := dArray.Element[tkey].(type) {
 				case *DO:
 					dObject = t
 					dArray = nil
-					jsonMode = JSON_OBJECT
+					jsonMode = OBJECT
 				case *DA:
 					dObject = nil
 					dArray = t
-					jsonMode = JSON_ARRAY
+					jsonMode = ARRAY
 				default:
-					return invalidPathError
+					return false
 				}
 			}
 		default:
-			return invalidPathError
+			return false
 		}
 	}
 
-	return invalidPathError
+	return false
 
 }
 
-func (m *DJSON) DoPathFunc(path string, val interface{},
+func (m *JSON) DoPathFunc(path string, val interface{},
 	arrayTaskFunc func(da *DA, idx int, v interface{}),
-	objectTaskFunc func(do *DO, key string, v interface{})) error {
+	objectTaskFunc func(do *DO, key string, v interface{})) bool {
 	return m.doPathFuncCore(arrayTaskFunc, objectTaskFunc, val, PathTokenizer(path)...)
 }
 
-func (m *DJSON) GetKeysPath(path string) ([]string, error) {
+func (m *JSON) KeysPath(path string) ([]string, bool) {
 	rk := make([]string, 0)
 
-	err := m.DoPathFunc(path, nil,
+	pok := m.DoPathFunc(path, nil,
 		func(da *DA, idx int, v interface{}) {
-			if ddo, ok := da.GetAsObject(idx); ok {
+			if ddo, ok := da.Object(idx); ok {
 				for k := range ddo.Map {
 					rk = append(rk, k)
 				}
 			}
 		},
 		func(do *DO, key string, v interface{}) {
-			if ddo, ok := do.GetAsObject(key); ok {
+			if ddo, ok := do.Object(key); ok {
 				for k := range ddo.Map {
 					rk = append(rk, k)
 				}
@@ -391,9 +353,9 @@ func (m *DJSON) GetKeysPath(path string) ([]string, error) {
 		},
 	)
 
-	if err != nil {
-		return []string{}, err
+	if !pok {
+		return []string{}, false
 	}
 
-	return rk, nil
+	return rk, true
 }

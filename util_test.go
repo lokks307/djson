@@ -13,6 +13,6 @@ func TestTokenizer(t *testing.T) {
 
 func TestParse(t *testing.T) {
 	doc := `[[1,2,3]]`
-	tdjson := NewDJSON().Parse(doc)
-	log.Println(tdjson.GetAsIntPath(`[0][0]`))
+	tdjson := New().Parse(doc)
+	log.Println(tdjson.IntPath(`[0][0]`))
 }

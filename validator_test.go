@@ -29,7 +29,7 @@ func TestValidator1(t *testing.T) {
 		}
 	}`)
 
-	asjon := NewDJSON().Parse(`{"name": "wakeupbb", "skill": ["040809","aaaaab"]}`)
+	asjon := New().Parse(`{"name": "wakeupbb", "skill": ["040809","aaaaab"]}`)
 
 	if dv.IsValid(asjon) {
 		log.Println("valid")
@@ -64,7 +64,7 @@ func TestValidator2(t *testing.T) {
 		}
 	},"HEX"]`)
 
-	asjon := NewDJSON().Parse(`FF112345`)
+	asjon := New().Parse(`FF112345`)
 
 	if dv.IsValid(asjon) {
 		log.Println("valid")
@@ -90,7 +90,7 @@ func TestValidator3(t *testing.T) {
 		}
 	}`)
 
-	asjon := NewDJSON().Parse(`{"name":{"age":"11y","home":"aaa"}}`)
+	asjon := New().Parse(`{"name":{"age":"11y","home":"aaa"}}`)
 
 	if dv.IsValid(asjon) {
 		log.Println("valid")
@@ -137,7 +137,7 @@ func TestValidator4(t *testing.T) {
 		}
 	}`)
 
-	asjon := NewDJSON().Parse(`{
+	asjon := New().Parse(`{
 		"service_name": "",
 		"service_id": "",
 		"call_address": "",
@@ -169,8 +169,8 @@ func TestValidator5(t *testing.T) {
 		"object": {}
 	}`)
 
-	asjon := NewDJSON().Parse(`{"name":"top"}`)
-	bsjon := NewDJSON().Parse(`[]`)
+	asjon := New().Parse(`{"name":"top"}`)
+	bsjon := New().Parse(`[]`)
 
 	if dv.IsValid(asjon) {
 		log.Println("valid")
@@ -195,8 +195,8 @@ func TestValidator6(t *testing.T) {
 		"object": {}
 	},"HEX"]`)
 
-	asjon := NewDJSON().Parse(`{"name":"top"}`)
-	bsjon := NewDJSON().Parse(`BB112233`)
+	asjon := New().Parse(`{"name":"top"}`)
+	bsjon := New().Parse(`BB112233`)
 
 	if dv.IsValid(asjon) {
 		log.Println("valid")

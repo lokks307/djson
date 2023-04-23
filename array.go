@@ -14,7 +14,7 @@ type DA struct {
 	Element     []interface{}
 }
 
-func NewArray() *DA {
+func NewDA() *DA {
 	return &DA{
 		Element: make([]interface{}, 0),
 	}
@@ -102,17 +102,17 @@ func (m *DA) ReplaceAt(idx int, value interface{}) *DA {
 	case DO:
 		m.Element[idx] = &t
 	case map[string]interface{}:
-		m.Element[idx] = ConverMapToObject(t)
+		m.Element[idx] = MapToObject(t)
 	case []interface{}:
-		m.Element[idx] = ConvertSliceToArray(t)
+		m.Element[idx] = SliceToArray(t)
 	case Object:
-		m.Element[idx] = ConverMapToObject(t)
+		m.Element[idx] = MapToObject(t)
 	case Array:
-		m.Element[idx] = ConvertSliceToArray(t)
-	case DJSON:
-		m.Element[idx] = t.GetAsInterface()
-	case *DJSON:
-		m.Element[idx] = t.GetAsInterface()
+		m.Element[idx] = SliceToArray(t)
+	case JSON:
+		m.Element[idx] = t.Interface()
+	case *JSON:
+		m.Element[idx] = t.Interface()
 	case nil:
 		m.Element[idx] = nil
 	}
@@ -134,7 +134,7 @@ func (m *DA) Insert(idx int, value interface{}) *DA {
 	return m.ReplaceAt(idx, value)
 }
 
-func (m *DA) PutAsArray(value interface{}) *DA {
+func (m *DA) PutArray(value interface{}) *DA {
 	m.Insert(m.Size(), value)
 	return m
 }
@@ -277,7 +277,7 @@ func (m *DA) Size() int {
 	return len(m.Element)
 }
 
-func (m *DA) Length() int {
+func (m *DA) Len() int {
 	return len(m.Element)
 }
 
@@ -298,7 +298,7 @@ func (m *DA) Get(idx int) (interface{}, bool) {
 	return m.Element[idx], true
 }
 
-func (m *DA) GetType(idx int) (string, bool) {
+func (m *DA) Type(idx int) (string, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return "", false
 	}
@@ -323,7 +323,7 @@ func (m *DA) GetType(idx int) (string, bool) {
 	return "", false
 }
 
-func (m *DA) GetAsBool(idx int) (bool, bool) {
+func (m *DA) Bool(idx int) (bool, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return false, false
 	}
@@ -335,7 +335,7 @@ func (m *DA) GetAsBool(idx int) (bool, bool) {
 	return false, false
 }
 
-func (m *DA) GetAsFloat(idx int) (float64, bool) {
+func (m *DA) Float(idx int) (float64, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return 0, false
 	}
@@ -347,7 +347,7 @@ func (m *DA) GetAsFloat(idx int) (float64, bool) {
 	return 0, false
 }
 
-func (m *DA) GetAsInt(idx int) (int64, bool) {
+func (m *DA) Int(idx int) (int64, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return 0, false
 	}
@@ -359,7 +359,7 @@ func (m *DA) GetAsInt(idx int) (int64, bool) {
 	return 0, false
 }
 
-func (m *DA) GetAsObject(idx int) (*DO, bool) {
+func (m *DA) Object(idx int) (*DO, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return nil, false
 	}
@@ -374,7 +374,7 @@ func (m *DA) GetAsObject(idx int) (*DO, bool) {
 	return nil, false
 }
 
-func (m *DA) GetAsArray(idx int) (*DA, bool) {
+func (m *DA) Array(idx int) (*DA, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return nil, false
 	}
@@ -389,7 +389,7 @@ func (m *DA) GetAsArray(idx int) (*DA, bool) {
 	return nil, false
 }
 
-func (m *DA) GetAsString(idx int) string {
+func (m *DA) String(idx int) string {
 	if idx >= m.Size() || idx < 0 {
 		return ""
 	}
@@ -414,7 +414,7 @@ func (m *DA) GetAsString(idx int) string {
 	return ""
 }
 
-func (m *DA) GetAsString2(idx int) (string, bool) {
+func (m *DA) String2(idx int) (string, bool) {
 	if idx >= m.Size() || idx < 0 {
 		return "", false
 	}
@@ -436,12 +436,12 @@ func (m *DA) GetAsString2(idx int) (string, bool) {
 }
 
 func (m *DA) ToStringPretty() string {
-	jsonByte, _ := json.MarshalIndent(ConvertArrayToSlice(m), "", "   ")
+	jsonByte, _ := json.MarshalIndent(ArrayToSlice(m), "", "   ")
 	return string(jsonByte)
 }
 
 func (m *DA) ToString() string {
-	jsonByte, _ := json.Marshal(ConvertArrayToSlice(m))
+	jsonByte, _ := json.Marshal(ArrayToSlice(m))
 	return string(jsonByte)
 }
 
@@ -455,7 +455,7 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 	var elemType string
 
 	for i := range m.Element {
-		do, ok := m.GetAsObject(i)
+		do, ok := m.Object(i)
 		if !ok {
 			return false
 		}
@@ -485,8 +485,8 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 			switch elemType {
 			case "string":
 
-				iRune := []rune(ido.GetAsString(key))
-				jRune := []rune(jdo.GetAsString(key))
+				iRune := []rune(ido.String(key))
+				jRune := []rune(jdo.String(key))
 
 				lenToInspect := len(iRune)
 				if len(jRune) < lenToInspect {
@@ -508,15 +508,15 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 				return len(iRune) < len(jRune)
 
 			case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-				iInt, _ := ido.GetAsInt(key)
-				jInt, _ := jdo.GetAsInt(key)
+				iInt, _ := ido.Int(key)
+				jInt, _ := jdo.Int(key)
 				return iInt < jInt
 			case "float32", "float64":
-				iFloat, _ := ido.GetAsFloat(key)
-				jFloat, _ := jdo.GetAsFloat(key)
+				iFloat, _ := ido.Float(key)
+				jFloat, _ := jdo.Float(key)
 				return iFloat < jFloat
 			case "bool":
-				jBool, _ := jdo.GetAsBool(key)
+				jBool, _ := jdo.Bool(key)
 				return jBool
 			default:
 				return true
@@ -532,8 +532,8 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 			switch elemType {
 			case "string":
 
-				iRune := []rune(ido.GetAsString(key))
-				jRune := []rune(jdo.GetAsString(key))
+				iRune := []rune(ido.String(key))
+				jRune := []rune(jdo.String(key))
 
 				lenToInspect := len(iRune)
 				if len(jRune) < lenToInspect {
@@ -555,15 +555,15 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 				return len(iRune) > len(jRune)
 
 			case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-				iInt, _ := ido.GetAsInt(key)
-				jInt, _ := jdo.GetAsInt(key)
+				iInt, _ := ido.Int(key)
+				jInt, _ := jdo.Int(key)
 				return iInt > jInt
 			case "float32", "float64":
-				iFloat, _ := ido.GetAsFloat(key)
-				jFloat, _ := jdo.GetAsFloat(key)
+				iFloat, _ := ido.Float(key)
+				jFloat, _ := jdo.Float(key)
 				return iFloat > jFloat
 			case "bool":
-				iBool, _ := ido.GetAsBool(key)
+				iBool, _ := ido.Bool(key)
 				return iBool
 			default:
 				return false
@@ -575,8 +575,7 @@ func (m *DA) SortObject(isAsc bool, key string) bool {
 
 }
 
-func (m *DA) Sort(isAsc bool) bool {
-
+func (m *DA) SortPrimitive(isAsc bool) bool {
 	numElement := len(m.Element)
 
 	if numElement == 0 {
@@ -624,15 +623,15 @@ func (m *DA) Sort(isAsc bool) bool {
 			sort.Slice(m.Element, func(i, j int) bool {
 				switch elemType {
 				case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-					iInt, _ := m.GetAsInt(i)
-					jInt, _ := m.GetAsInt(j)
+					iInt, _ := m.Int(i)
+					jInt, _ := m.Int(j)
 					return iInt < jInt
 				case "float32", "float64":
-					iFloat, _ := m.GetAsFloat(i)
-					jFloat, _ := m.GetAsFloat(j)
+					iFloat, _ := m.Float(i)
+					jFloat, _ := m.Float(j)
 					return iFloat < jFloat
 				case "bool":
-					jBool, _ := m.GetAsBool(j)
+					jBool, _ := m.Bool(j)
 					return jBool
 				default:
 					return true
@@ -642,15 +641,15 @@ func (m *DA) Sort(isAsc bool) bool {
 			sort.Slice(m.Element, func(i, j int) bool {
 				switch elemType {
 				case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-					iInt, _ := m.GetAsInt(i)
-					jInt, _ := m.GetAsInt(j)
+					iInt, _ := m.Int(i)
+					jInt, _ := m.Int(j)
 					return iInt > jInt
 				case "float32", "float64":
-					iFloat, _ := m.GetAsFloat(i)
-					jFloat, _ := m.GetAsFloat(j)
+					iFloat, _ := m.Float(i)
+					jFloat, _ := m.Float(j)
 					return iFloat < jFloat
 				case "bool":
-					iBool, _ := m.GetAsBool(i)
+					iBool, _ := m.Bool(i)
 					return iBool
 				default:
 					return false
@@ -662,12 +661,28 @@ func (m *DA) Sort(isAsc bool) bool {
 	}
 }
 
-func (m *DA) SortAsc() bool {
-	return m.Sort(true)
+func (m *DA) Sort(isAsc bool, key ...string) bool {
+	if len(key) == 0 {
+		return m.SortPrimitive(isAsc)
+	} else {
+		return m.SortObject(isAsc, key[0])
+	}
 }
 
-func (m *DA) SortDesc() bool {
-	return m.Sort(false)
+func (m *DA) SortAsc(key ...string) bool {
+	if len(key) == 0 {
+		return m.SortPrimitive(true)
+	} else {
+		return m.SortObject(true, key[0])
+	}
+}
+
+func (m *DA) SortDesc(key ...string) bool {
+	if len(key) == 0 {
+		return m.SortPrimitive(false)
+	} else {
+		return m.SortObject(false, key[0])
+	}
 }
 
 func (m *DA) Equal(t *DA) bool {
@@ -691,44 +706,44 @@ func (m *DA) Equal(t *DA) bool {
 			return false
 		}
 
-		switch mtype {
-		case "string":
+		switch m.Element[i].(type) {
+		case string:
 			if m.Element[i].(string) != t.Element[i].(string) {
 				return false
 			}
-		case "bool":
+		case bool:
 			if m.Element[i].(bool) != t.Element[i].(bool) {
 				return false
 			}
-		case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-			mInt, _ := m.GetAsInt(i)
-			tInt, _ := t.GetAsInt(i)
+		case int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64:
+			mInt, _ := m.Int(i)
+			tInt, _ := t.Int(i)
 			if mInt != tInt {
 				return false
 			}
-		case "float32", "float64":
-			mFloat, _ := m.GetAsFloat(i)
-			tFloat, _ := t.GetAsFloat(i)
+		case float32, float64:
+			mFloat, _ := m.Float(i)
+			tFloat, _ := t.Float(i)
 			if mFloat != tFloat {
 				return false
 			}
-		case "*djson.DO":
+		case *DO:
 			mdo := m.Element[i].(*DO)
 			tdo := t.Element[i].(*DO)
 
 			if !mdo.Equal(tdo) {
 				return false
 			}
-		case "*djson.DA":
+		case *DA:
 			mda := m.Element[i].(*DA)
 			tda := t.Element[i].(*DA)
 
 			if !mda.Equal(tda) {
 				return false
 			}
-		case "*djson.DJSON":
-			mjson := m.Element[i].(*DJSON)
-			tjson := t.Element[i].(*DJSON)
+		case *JSON:
+			mjson := m.Element[i].(*JSON)
+			tjson := t.Element[i].(*JSON)
 
 			if !mjson.Equal(tjson) {
 				return false
@@ -741,7 +756,7 @@ func (m *DA) Equal(t *DA) bool {
 
 func (m *DA) Clone() *DA {
 
-	t := NewArray()
+	t := NewDA()
 
 	t.Element = make([]interface{}, m.Size())
 
@@ -750,25 +765,23 @@ func (m *DA) Clone() *DA {
 			t.Element[i] = nil
 		}
 
-		mtype := reflect.TypeOf(m.Element[i]).String()
-
-		switch mtype {
-		case "string":
+		switch m.Element[i].(type) {
+		case string:
 			t.Element[i] = m.Element[i].(string)
-		case "bool":
+		case bool:
 			t.Element[i] = m.Element[i].(bool)
-		case "int", "uint", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64":
-			t.Element[i], _ = m.GetAsInt(i)
-		case "float32", "float64":
-			t.Element[i], _ = m.GetAsFloat(i)
-		case "*djson.DO":
+		case int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64:
+			t.Element[i], _ = m.Int(i)
+		case float32, float64:
+			t.Element[i], _ = m.Float(i)
+		case *DO:
 			mdo := m.Element[i].(*DO)
 			t.Element[i] = mdo.Clone()
-		case "*djson.DA":
+		case *DA:
 			mda := m.Element[i].(*DA)
 			t.Element[i] = mda.Clone()
-		case "*djson.DJSON":
-			mdjson := m.Element[i].(*DJSON)
+		case *JSON:
+			mdjson := m.Element[i].(*JSON)
 			t.Element[i] = mdjson.Clone()
 		}
 	}
@@ -784,7 +797,11 @@ func (m *DA) Seek(seekp ...int) {
 	}
 }
 
-func (m *DA) Next() (interface{}, bool) {
+func (m *DA) Next() bool {
+	return len(m.Element) > m.SeekPointer
+}
+
+func (m *DA) Scan() (interface{}, bool) {
 	if len(m.Element) <= m.SeekPointer {
 		return nil, false
 	}
