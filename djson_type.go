@@ -5,13 +5,13 @@ func (m *JSON) getTypeSimple(key interface{}) string {
 	switch m._Type {
 	case OBJECT:
 		if key, tok := key.(string); tok {
-			if typeStr, ok := m._Object.GetType(key); ok {
+			if typeStr, ok := m._Object.Type(key); ok {
 				return typeStr
 			}
 		}
 	case ARRAY:
 		if idx, tok := key.(int); tok {
-			if typeStr, ok := m._Array.GetType(idx); ok {
+			if typeStr, ok := m._Array.Type(idx); ok {
 				return typeStr
 			}
 		}

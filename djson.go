@@ -521,12 +521,12 @@ func (m *JSON) Object(key ...interface{}) (*JSON, bool) {
 		switch tkey := key[0].(type) {
 		case string:
 			if m._Type == OBJECT {
-				newObject, ok = m._Object.GetAsObject(tkey)
+				newObject, ok = m._Object.Object(tkey)
 			}
 		default:
 			kint, oki := getIntBase(key[0])
 			if oki && m._Type == ARRAY {
-				newObject, ok = m._Array.GetAsObject(int(kint))
+				newObject, ok = m._Array.Object(int(kint))
 			}
 		}
 
@@ -566,12 +566,12 @@ func (m *JSON) Array(key ...interface{}) (*JSON, bool) {
 		switch tkey := key[0].(type) {
 		case string:
 			if m._Type == OBJECT {
-				newArray, ok = m._Object.GetAsArray(tkey)
+				newArray, ok = m._Object.Array(tkey)
 			}
 		default:
 			kint, oki := getIntBase(key[0])
 			if oki && m._Type == ARRAY {
-				newArray, ok = m._Array.GetAsArray(int(kint))
+				newArray, ok = m._Array.Array(int(kint))
 			}
 		}
 
@@ -629,14 +629,14 @@ func (m *JSON) Int(key ...interface{}) int64 {
 		switch tkey := key[0].(type) {
 		case string:
 			if m._Type == OBJECT {
-				if iVal, ok := m._Object.GetAsInt(tkey); ok {
+				if iVal, ok := m._Object.Int(tkey); ok {
 					return iVal
 				}
 			}
 		default:
 			kint, ok := getIntBase(key[0])
 			if ok && m._Type == ARRAY {
-				if iVal, ok := m._Array.GetAsInt(int(kint)); ok {
+				if iVal, ok := m._Array.Int(int(kint)); ok {
 					return iVal
 				}
 			}
@@ -676,14 +676,14 @@ func (m *JSON) Bool(key ...interface{}) bool {
 		switch tkey := key[0].(type) {
 		case string:
 			if m._Type == OBJECT {
-				if bVal, ok := m._Object.GetAsBool(tkey); ok {
+				if bVal, ok := m._Object.Bool(tkey); ok {
 					return bVal
 				}
 			}
 		default:
 			kint, ok := getIntBase(key[0])
 			if ok && m._Type == ARRAY {
-				if bVal, ok := m._Array.GetAsBool(int(kint)); ok {
+				if bVal, ok := m._Array.Bool(int(kint)); ok {
 					return bVal
 				}
 			}
@@ -732,14 +732,14 @@ func (m *JSON) Float(key ...interface{}) float64 {
 		switch tkey := key[0].(type) {
 		case string:
 			if m._Type == OBJECT {
-				if fVal, ok := m._Object.GetAsFloat(tkey); ok {
+				if fVal, ok := m._Object.Float(tkey); ok {
 					return fVal
 				}
 			}
 		default:
 			kint, ok := getIntBase(key[0])
 			if ok && m._Type == ARRAY {
-				if fVal, ok := m._Array.GetAsFloat(int(kint)); ok {
+				if fVal, ok := m._Array.Float(int(kint)); ok {
 					return fVal
 				}
 			}
@@ -852,9 +852,16 @@ func (m *JSON) Seek(seekp ...int) bool {
 	return false
 }
 
-func (m *JSON) Next() *JSON {
+func (m *JSON) Next() bool {
 	if m._Type == ARRAY {
-		v, ok := m._Array.Next()
+		return m._Array.Next()
+	}
+	return false
+}
+
+func (m *JSON) Scan() *JSON {
+	if m._Type == ARRAY {
+		v, ok := m._Array.Scan()
 		if !ok {
 			return nil
 		}

@@ -22,11 +22,11 @@ func TestParseJson(t *testing.T) {
 	if err == nil {
 		log.Println(obj.String("name"))
 		log.Println(obj.String("age"))
-		arr, ok := obj.GetAsArray("address")
+		arr, ok := obj.Array("address")
 		if !ok {
 			log.Fatal("no such key")
 		}
-		log.Println(arr.GetAsString(1))
+		log.Println(arr.String(1))
 	}
 }
 
@@ -52,7 +52,7 @@ func TestParseArray(t *testing.T) {
 
 	arr, err := ParseToArray(jsonDoc)
 	if err == nil {
-		obj, ok := arr.GetAsObject(0)
+		obj, ok := arr.Object(0)
 		if !ok {
 			log.Fatal("no such index")
 		}
@@ -282,21 +282,21 @@ func TestSeekNext(t *testing.T) {
 
 	aJson := New().Parse(jsonDoc)
 
-	bJson := aJson.Next()
+	bJson := aJson.Scan()
 	if bJson == nil {
 		log.Fatal("not object")
 	}
 
 	log.Println(bJson.ToString())
 
-	bJson = aJson.Next()
+	bJson = aJson.Scan()
 	if bJson == nil {
 		log.Fatal("not object")
 	}
 
 	log.Println(bJson.ToString())
 
-	bJson = aJson.Next()
+	bJson = aJson.Scan()
 	if bJson == nil {
 		log.Fatal("not object")
 	}

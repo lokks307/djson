@@ -256,7 +256,7 @@ func ParseArray(data []interface{}) *DA {
 		switch tValue := data[idx].(type) {
 		case []interface{}: // Array
 			nArr := ParseArray(tValue)
-			arr.PutAsArray(nArr)
+			arr.PutArray(nArr)
 		case map[string]interface{}: // Object
 			nObj := ParseObject(tValue)
 			arr.Put(nObj)
@@ -329,4 +329,249 @@ func PathTokenizer(path string) []interface{} {
 	}
 
 	return outTokens
+}
+
+func MustSome(opt *JSON, keys ...interface{}) bool {
+	if opt == nil {
+		return false
+	}
+
+	for _, key := range keys {
+		if opt.String(key) == "" {
+			return false
+		}
+	}
+
+	return true
+}
+
+func MustGetObject(o *JSON, key interface{}) *JSON {
+	emptyObjectJson := New(OBJECT)
+	if o == nil || key == "" {
+		return emptyObjectJson
+	}
+
+	r, ok := o.Object(key)
+	if !ok || r == nil {
+		return emptyObjectJson
+	}
+	return r
+}
+
+func MustGetArray(o *JSON, key interface{}) *JSON {
+	emptyArrayJson := New(ARRAY)
+	if o == nil || key == "" {
+		return emptyArrayJson
+	}
+
+	r, ok := o.Array(key)
+	if !ok || r == nil {
+		return emptyArrayJson
+	}
+	return r
+}
+
+func MustGetString(o *JSON, key interface{}) string {
+	if o == nil || key == "" {
+		return ""
+	}
+	return o.String(key)
+}
+
+func MustGetBool(o *JSON, key interface{}) bool {
+	if o == nil || key == "" {
+		return false
+	}
+	return o.Bool(key)
+}
+
+func MustGetInt(o *JSON, key interface{}) int64 {
+	if o == nil || key == "" {
+		return 0
+	}
+	return o.Int(key)
+}
+
+// o = object djson
+func MustGetStringSlice(o *JSON, key interface{}) []string {
+	emptyArraySlice := make([]string, 0)
+	if o == nil || key == "" {
+		return emptyArraySlice
+	}
+
+	r, ok := o.Array(key)
+	if !ok || r == nil {
+		return emptyArraySlice
+	}
+	return ArrayJsonToStringSlice(r)
+}
+
+func MustGetInt64Slice(o *JSON, key interface{}) []int64 {
+	emptyArraySlice := make([]int64, 0)
+	if o == nil || key == "" {
+		return emptyArraySlice
+	}
+
+	r, ok := o.Array(key)
+	if !ok || r == nil {
+		return emptyArraySlice
+	}
+	return JsonToInt64Slice(r)
+}
+
+func MustGetIntSlice(o *JSON, key interface{}) []int {
+	emptyArraySlice := make([]int, 0)
+	if o == nil || key == "" {
+		return emptyArraySlice
+	}
+
+	r, ok := o.Array(key)
+	if !ok || r == nil {
+		return emptyArraySlice
+	}
+	return JsonToIntSlice(r)
+}
+
+func StringSliceToJson(ss []string) *JSON {
+	retJson := New(ARRAY)
+	for _, s := range ss {
+		if s != "" {
+			retJson.PutArray(s)
+		}
+	}
+
+	return retJson
+}
+
+func StringMapToArray(ss map[string]string) Array {
+	var retArray Array
+	for _, s := range ss {
+		if s != "" {
+			retArray = append(retArray, s)
+		}
+	}
+
+	return retArray
+}
+
+func Int64SliceToArray(is []int64) Array {
+	var retArray Array
+	for _, s := range is {
+		retArray = append(retArray, s)
+	}
+
+	return retArray
+}
+
+func StringSliceToArray(ss []string) Array {
+	var retArray Array
+	for _, s := range ss {
+		if s != "" {
+			retArray = append(retArray, s)
+		}
+	}
+
+	return retArray
+}
+
+func IntSliceToJson(ss []int) *JSON {
+	retJson := New(ARRAY)
+	for _, s := range ss {
+		retJson.PutArray(s)
+	}
+
+	return retJson
+}
+
+// js must be array json
+func ArrayJsonToStringSlice(js *JSON, key ...string) []string {
+	if js == nil || !js.IsArray() || js.Size() == 0 {
+		return []string{}
+	}
+
+	ss := make([]string, 0)
+	js.Seek()
+	if len(key) > 0 {
+		for js.Next() {
+			ec := js.Scan()
+			ss = append(ss, ec.String(key[0]))
+		}
+	} else {
+		for js.Next() {
+			ec := js.Scan()
+			ss = append(ss, ec.ToString())
+		}
+	}
+	return ss
+}
+
+func JsonToIntSlice(js *JSON, key ...string) []int {
+	if js == nil || !js.IsArray() || js.Size() == 0 {
+		return []int{}
+	}
+
+	ss := make([]int, 0)
+	js.Seek()
+	if len(key) > 0 {
+		for js.Next() {
+			ec := js.Scan()
+			ss = append(ss, int(ec.Int(key[0])))
+		}
+	} else {
+		for js.Next() {
+			ec := js.Scan()
+			ss = append(ss, int(ec.Int()))
+		}
+	}
+	return ss
+}
+
+func JsonToInt64Slice(js *JSON, key ...string) []int64 {
+	if js == nil || !js.IsArray() || js.Size() == 0 {
+		return []int64{}
+	}
+
+	ss := make([]int64, 0)
+	js.Seek()
+	if len(key) > 0 {
+		for js.Next() {
+			ec := js.Scan()
+			ss = append(ss, ec.Int(key[0]))
+		}
+	} else {
+		for js.Next() {
+			ec := js.Scan()
+			ss = append(ss, ec.Int())
+		}
+	}
+	return ss
+}
+
+func JsonFilter(js *JSON, keys ...string) *JSON {
+	ret := New(ARRAY)
+	if js == nil || !js.IsArray() {
+		return ret
+	}
+
+	js.Seek()
+	for js.Next() {
+		ec := js.Scan()
+		nec := New()
+		for _, k := range keys {
+			if k == "" {
+				continue
+			}
+
+			v, ok := ec.Get(k)
+			if ok {
+				nec.Put(k, v)
+			} else {
+				nec.Put(k, nil)
+			}
+		}
+
+		ret.PutArray(nec)
+	}
+
+	return ret
 }
