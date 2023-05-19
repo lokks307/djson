@@ -175,7 +175,7 @@ func IsInTypes(v interface{}, types ...string) bool {
 func ParseToObject(doc string) (*DO, error) {
 	var data map[string]interface{}
 
-	d := json.NewDecoder(strings.NewReader(doc))
+	d := xjson.NewDecoder(strings.NewReader(doc))
 	d.UseNumber()
 
 	if err := d.Decode(&data); err != nil {
@@ -189,7 +189,7 @@ func ParseToObject(doc string) (*DO, error) {
 func ParseToArray(doc string) (*DA, error) {
 	var data []interface{}
 
-	d := json.NewDecoder(strings.NewReader(doc))
+	d := xjson.NewDecoder(strings.NewReader(doc))
 	d.UseNumber()
 
 	if err := d.Decode(&data); err != nil {
@@ -200,6 +200,7 @@ func ParseToArray(doc string) (*DA, error) {
 }
 
 func ParseObject(data map[string]interface{}) *DO {
+
 	obj := NewDO()
 	for k, v := range data {
 		if IsBaseType(v) {

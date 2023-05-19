@@ -300,12 +300,12 @@ func (m *DO) Remove(keys ...string) *DO {
 }
 
 func (m *DO) ToStringPretty() string {
-	jsonByte, _ := json.MarshalIndent(ObjectToMap(m), "", "   ")
+	jsonByte, _ := xjson.MarshalIndent(ObjectToMap(m), "", "   ")
 	return string(jsonByte)
 }
 
 func (m *DO) ToString() string {
-	jsonByte, err := json.Marshal(ObjectToMap(m))
+	jsonByte, err := xjson.Marshal(ObjectToMap(m))
 	if err != nil {
 		// log.Println(err)
 		return ""
@@ -425,4 +425,15 @@ func (m *DO) Clone() *DO {
 	}
 
 	return t
+}
+
+func (m *DO) Rename(from, to string) bool {
+	if !m.HasKey(from) || from == to {
+		return false
+	}
+
+	m.Map[to] = m.Map[from]
+	delete(m.Map, from)
+
+	return true
 }

@@ -304,6 +304,30 @@ func TestSeekNext(t *testing.T) {
 	log.Println(bJson.ToString())
 }
 
+func TestLoop(t *testing.T) {
+
+	jsonDoc := `[
+		1,
+		2,
+		3,
+		4
+	]`
+
+	aJson := New().Parse(jsonDoc)
+
+	for aJson.Next() {
+		log.Println(aJson.Scan().ToString())
+	}
+
+	aJson.Seek(0)
+
+	aJson.Next()
+	aJson.Next()
+	aJson.Next()
+	log.Println(aJson.Scan().ToString())
+
+}
+
 func TestFloat(t *testing.T) {
 
 	jsonDoc := `{"number": "NaN"}`

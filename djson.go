@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
+
 	gov "github.com/asaskevich/govalidator"
 )
 
@@ -26,6 +28,12 @@ type JSON struct {
 	_Float  float64
 	_Bool   bool
 	_Type   int
+}
+
+var xjson jsoniter.API
+
+func init() {
+	xjson = jsoniter.ConfigCompatibleWithStandardLibrary
 }
 
 func New(v ...int) *JSON {
@@ -821,6 +829,14 @@ func (m *JSON) ToString() string {
 	}
 
 	return "" // zero value
+}
+
+func (m *JSON) Rename(from, to string) bool {
+	if m._Type != OBJECT {
+		return false
+	}
+
+	return m._Object.Rename(from, to)
 }
 
 func (m *JSON) ReplaceAt(k interface{}, v interface{}) *JSON {
