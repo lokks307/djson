@@ -436,12 +436,12 @@ func (m *DA) String2(idx int) (string, bool) {
 }
 
 func (m *DA) ToStringPretty() string {
-	jsonByte, _ := json.MarshalIndent(ArrayToSlice(m), "", "   ")
+	jsonByte, _ := xjson.MarshalIndent(ArrayToSlice(m), "", "   ")
 	return string(jsonByte)
 }
 
 func (m *DA) ToString() string {
-	jsonByte, _ := json.Marshal(ArrayToSlice(m))
+	jsonByte, _ := xjson.Marshal(ArrayToSlice(m))
 	return string(jsonByte)
 }
 
@@ -802,11 +802,18 @@ func (m *DA) Next() bool {
 }
 
 func (m *DA) Scan() (interface{}, bool) {
+	defer func() {
+		m.SeekPointer++
+	}()
+
 	if len(m.Element) <= m.SeekPointer {
 		return nil, false
 	}
 
 	ret := m.Element[m.SeekPointer]
-	m.SeekPointer++
 	return ret, true
+}
+
+func (m *DA) Skip() {
+	m.SeekPointer++
 }
