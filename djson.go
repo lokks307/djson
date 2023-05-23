@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	jsoniter "github.com/json-iterator/go"
-
 	gov "github.com/asaskevich/govalidator"
 )
 
@@ -28,12 +26,6 @@ type JSON struct {
 	_Float  float64
 	_Bool   bool
 	_Type   int
-}
-
-var xjson jsoniter.API
-
-func init() {
-	xjson = jsoniter.ConfigCompatibleWithStandardLibrary
 }
 
 func New(v ...int) *JSON {

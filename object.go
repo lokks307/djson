@@ -1,10 +1,10 @@
 package djson
 
 import (
-	"encoding/json"
 	"math"
 	"reflect"
 
+	"github.com/goccy/go-json"
 	"github.com/volatiletech/null/v8"
 )
 
@@ -300,12 +300,12 @@ func (m *DO) Remove(keys ...string) *DO {
 }
 
 func (m *DO) ToStringPretty() string {
-	jsonByte, _ := xjson.MarshalIndent(ObjectToMap(m), "", "   ")
+	jsonByte, _ := json.MarshalIndent(ObjectToMap(m), "", "   ")
 	return string(jsonByte)
 }
 
 func (m *DO) ToString() string {
-	jsonByte, err := xjson.Marshal(ObjectToMap(m))
+	jsonByte, err := json.Marshal(ObjectToMap(m))
 	if err != nil {
 		// log.Println(err)
 		return ""

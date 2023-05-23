@@ -1,7 +1,6 @@
 package djson
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -9,6 +8,7 @@ import (
 	"strings"
 
 	gov "github.com/asaskevich/govalidator"
+	"github.com/goccy/go-json"
 )
 
 func MapToObject(dmap map[string]interface{}) *DO {
@@ -175,7 +175,7 @@ func IsInTypes(v interface{}, types ...string) bool {
 func ParseToObject(doc string) (*DO, error) {
 	var data map[string]interface{}
 
-	d := xjson.NewDecoder(strings.NewReader(doc))
+	d := json.NewDecoder(strings.NewReader(doc))
 	d.UseNumber()
 
 	if err := d.Decode(&data); err != nil {
@@ -189,7 +189,7 @@ func ParseToObject(doc string) (*DO, error) {
 func ParseToArray(doc string) (*DA, error) {
 	var data []interface{}
 
-	d := xjson.NewDecoder(strings.NewReader(doc))
+	d := json.NewDecoder(strings.NewReader(doc))
 	d.UseNumber()
 
 	if err := d.Decode(&data); err != nil {

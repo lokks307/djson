@@ -1,11 +1,11 @@
 package djson
 
 import (
-	"encoding/json"
 	"math"
 	"reflect"
 	"sort"
 
+	"github.com/goccy/go-json"
 	"github.com/volatiletech/null/v8"
 )
 
@@ -436,12 +436,12 @@ func (m *DA) String2(idx int) (string, bool) {
 }
 
 func (m *DA) ToStringPretty() string {
-	jsonByte, _ := xjson.MarshalIndent(ArrayToSlice(m), "", "   ")
+	jsonByte, _ := json.MarshalIndent(ArrayToSlice(m), "", "   ")
 	return string(jsonByte)
 }
 
 func (m *DA) ToString() string {
-	jsonByte, _ := xjson.Marshal(ArrayToSlice(m))
+	jsonByte, _ := json.Marshal(ArrayToSlice(m))
 	return string(jsonByte)
 }
 
