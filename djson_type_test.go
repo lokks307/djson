@@ -36,3 +36,13 @@ func TestGetType(t *testing.T) {
 
 	log.Println(mJson.Float(1, 0.7))
 }
+
+func TestFloatNumber(t *testing.T) {
+	var a int
+	a = 15
+	d := New().Put(Object{
+		"tt": float64(a) / 10.0,
+	})
+
+	log.Println(d.ToString())
+}
