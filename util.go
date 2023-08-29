@@ -338,7 +338,7 @@ func MustSome(opt *JSON, keys ...interface{}) bool {
 	}
 
 	for _, key := range keys {
-		if opt.String(key) == "" {
+		if opt.String(key, "") == "" {
 			return false
 		}
 	}
