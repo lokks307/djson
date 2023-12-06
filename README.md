@@ -10,31 +10,53 @@
 ### 1.1. New JSON
 
 ```go
-mJson := djson.NewDJSON()
+mJson := djson.New()
 ```
 
 ### 1.2. Assign values to JSON
 
 ```go
 // Array
-mJson := djson.NewDJSON()
+mJson := djson.New()
 mJson.Put(djson.Array{
-    1,2,3,4,5,6
+    1,2,3,4,5,6,
 })
+
+fmt.Println(mJson.ToString()) // must be [1,2,3,4,5,6]
 ```
 
 ```go
 // Object
-mJson := djson.NewDJSON()
+mJson := djson.New()
 mJson.Put(djson.Object{
     "name":  "Hery Victor",
     "idade": 32,
 })
+
+fmt.Println(mJson.ToString()) // must be {"idade":32,"name":"Hery Victor"}
 ```
+
+### 1.2. Assign Arrays to JSON
+```go
+mJson := djson.New()
+intArray := []int{1, 2, 3, 4, 5}
+intVal := 3
+strArray := []string{"yes", "this", "is right"}
+strVal := "abc"
+
+mJson.Put("int_array", djson.NewArray(intArray))
+mJson.Put("int_val", intVal)
+mJson.Put("str_array", djson.NewArray(strArray))
+mJson.Put("str_val", strVal)
+
+fmt.Println(mJson.ToString())
+// must be like {"int_array":[1,2,3,4,5],"int_val":3,"str_array":["yes","this","is right"],"str_val":"abc"}
+```
+
 
 ### 1.3. Assign table values to JSON
 ```go
-mJson := djson.NewDJSON()
+mJson := djson.New()
 mJson.Put(
     djson.Array{
         djson.Object{
@@ -55,13 +77,15 @@ mJson.Put(
         },
     },
 )
+
+fmt.Println(mJson.ToString()) // must be like [{"idade":28,"name":"Ricardo Longa","skills":["Golang","Android"]},{"idade":32,"name":"Hery Victor","skills":["Golang","Java"]}]
 ```
 
 ### 1.4. Append values to existing JSON
 
 ```go
 // Array
-mJson := djson.NewDJSON()
+mJson := djson.New()
 
 mJson.Put(djson.Array{
     1,2,3,4,5,6,
@@ -76,21 +100,21 @@ fmt.Println(mJson.ToString()) // must be [1,2,3,4,5,6,7,8,9]
 
 ```go
 // Object
-mJson := djson.NewDJSON()
+mJson := djson.New()
+
+mJson.Put(djson.Object{
+        "idade": 28,
+    })
 
 mJson.Put(djson.Object{
     "name":"Hery Victor",
 })
 
 mJson.Put(djson.Object{
-    "idade": 28,
-})
-
-mJson.Put(djson.Object{
     "name":"Ricardo Longa", // overwrite existing value
 })
 
-fmt.Println(mJson.ToString()) // must be like {"name":"Ricardo Longa","idade":28}
+fmt.Println(mJson.ToString()) // must be like {"idade":28,"name":"Ricardo Longa"}
 ```
 
 ### 1.5. Parse existing JSON string
@@ -114,7 +138,9 @@ jsonDoc := `[
     }
 ]`
 
-mJson := NewDJSON().Parse(jsonDoc)
+mJson := djson.New().Parse(jsonDoc)
+
+fmt.Println(mJson.ToString()) // must be like [{"idade":28,"name":"Ricardo Longa","skills":["Golang","Android"]},{"idade":32,"name":"Hery Victor","skills":["Golang","Java"]}]
 ```
 
 ### 1.6. Get values
@@ -129,23 +155,23 @@ jsonDoc := `[
     }
 ]`
 
-mJson := NewDJSON().Parse(jsonDoc)
+mJson := djson.New().Parse(jsonDoc)
 
-// must be like [{"name":"Ricardo Longa","idade":28,"skills":["Golang","Android"]}]
+// must be like [{"idade":28,"name":"Ricardo Longa","skills":["Golang","Android"]}]
 fmt.Println(mJson.ToString()) 
 
-// must be like {"name":"Ricardo Longa","idade":28,"skills":["Golang","Android"]}
-fmt.Println(mJson.GetAsString(0)) 
+// must be like {"idade":28,"name":"Ricardo Longa","skills":["Golang","Android"]}
+fmt.Println(mJson.String(0)) 
 
-aJson, _ := mJson.GetAsObject(0)
+aJson, _ := mJson.Object(0)
 
-fmt.Println(aJson.GetAsInt("idade")) // 28
-fmt.Println(aJson.GetAsString("idade")) // 28
+fmt.Println(aJson.Int("idade")) // 28
+fmt.Println(aJson.String("idade")) // 28
 
-fmt.Println(aJson.GetAsInt("name")) // 0
-fmt.Println(aJson.GetAsString("name")) // Ricardo Longa
+fmt.Println(aJson.Int("name")) // 0
+fmt.Println(aJson.String("name")) // Ricardo Longa
 
-fmt.Println(aJson.GetAsString("skills")) // ["Golang","Android"]
+fmt.Println(aJson.String("skills")) // ["Golang","Android"]
 ```
 
 ## 2. Advanced Syntax
@@ -161,11 +187,12 @@ jsonDoc := `{
     ]
 }`
 
-mJson := NewDJSON().Parse(jsonDoc)
-aJson, _ := mJson.GetAsArray("skills")
+mJson := djson.New().Parse(jsonDoc)
+aJson, _ := mJson.Array("skills")
 
-fmt.Println(mJson.HasKey("skill")) // true
+fmt.Println(mJson.HasKey("skills")) // true
 fmt.Println(aJson.Haskey(1)) // true
+fmt.Println(aJson.HasKey("addr"))   // false
 
 ```
 
@@ -183,11 +210,11 @@ jsonDoc := `[{
     "skills":[ "Golang", "Java" ]
 }]`
 
-mJson := NewDJSON().Parse(jsonDoc)
+mJson := djson.New().Parse(jsonDoc)
 
 _ = mJson.UpdatePath(`[1]["name"]`, djson.Object{
-    "first":  "Hery",
     "family": "Victor",
+    "first":  "Hery",
 })
 
 // must be like
@@ -210,7 +237,7 @@ jsonDoc := `[{
     "skills":[ "Golang", "Java" ]
 }]`
 
-mJson := NewDJSON().Parse(jsonDoc)
+mJson := djson.New().Parse(jsonDoc)
 
 _ = mJson.RemovePath(`[1]["skills"]`)
 
@@ -233,9 +260,9 @@ jsonDoc := `[{
     "skills":["Golang","Java"]
 }]`
 
-aJson := NewDJSON().Parse(jsonDoc)
+aJson := djson.New().Parse(jsonDoc)
 
-bJson, _ := aJson.GetAsObject(1) // now, bJson shares *djson.DO with aJson
+bJson, _ := aJson.Object(1) // now, bJson shares *djson.DO with aJson
 
 bJson.Put(djson.Object{"hobbies": djson.Array{"game"}}) // append Array to Object
 bJson.UpdatePath(`["hobbies"][1]`, "running") // append value to Array
@@ -256,11 +283,11 @@ jsonDoc := `{
     "skills":["Golang","Android"]
 }`
 
-mJson := NewDJSON().Parse(jsonDoc)
+mJson := djson.New().Parse(jsonDoc)
 
-fmt.Println(mJson.GetAsInt("idade", 10)) // must be 28
-fmt.Println(mJson.GetAsInt("name", 10)) // must be 10 because `name` field cannot be convert to integer
-fmt.Println(mJson.GetAsInt("hobbies", 10)) // must be 10 because no such field `hobbies`
+fmt.Println(mJson.Int("idade", 10)) // must be 28 which is int64
+fmt.Println(mJson.Int("name", 10)) // must be 10 because `name` field cannot be convert to integer
+fmt.Println(mJson.Int("hobbies", 10)) // must be 10 because no such field `hobbies`
 ```
 
 ### 2.5. To Structure
@@ -274,7 +301,7 @@ type User struct {
 
 var user User
 
-mJson := NewDJSON().Put(
+mJson := djson.New().Put(
     Object{
         "id":    "id-1234",
         "name":  "Ricardo Longa",
@@ -304,13 +331,12 @@ var user = User{
     },
 }
 
-mJson := NewDJSON()
+mJson := djson.New()
 mJson.FromFields(user) // no tag
 
 // must be like {"email":"longa@test.com","id":"id-1234","name":"Ricardo Longa"}
 fmt.Println(mJson.ToString()) 
 
-}
 ```
 
 ### 2.7. From Map and Structure
@@ -333,7 +359,7 @@ user["email"] = null.String{
     Valid:  true,
 }
 
-mJson := NewDJSON()
+mJson := djson.New()
 mJson.FromFields(user, "name.first", "email") // tag has depth concept
 
 // must be like {"email":"longa@test.com","name":{"first":"Ricardo"}}
