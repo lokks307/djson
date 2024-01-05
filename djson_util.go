@@ -165,33 +165,89 @@ func (m *JSON) fromFieldsValue(val reflect.Value, tags ...string) {
 			case reflect.Struct, reflect.Map:
 				switch eachType.String() {
 				case "null.String":
-					m.PutArray(eachVal.FieldByName("String").String())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("String").String())
+					} else {
+						m.PutArray("")
+					}
 				case "null.Bool":
-					m.PutArray(eachVal.FieldByName("Bool").Bool())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Bool").Bool())
+					} else {
+						m.PutArray(false)
+					}
 				case "null.Float32":
-					m.PutArray(eachVal.FieldByName("Float32").Float())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Float32").Float())
+					} else {
+						m.PutArray(float32(0.0))
+					}
 				case "null.Float64":
-					m.PutArray(eachVal.FieldByName("Float64").Float())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Float64").Float())
+					} else {
+						m.PutArray(float64(0.0))
+					}
 				case "null.Int":
-					m.PutArray(eachVal.FieldByName("Int").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Int").Int())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Int8":
-					m.PutArray(eachVal.FieldByName("Int8").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Int8").Int())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Int16":
-					m.PutArray(eachVal.FieldByName("Int16").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Int16").Int())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Int32":
-					m.PutArray(eachVal.FieldByName("Int32").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Int32").Int())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Int64":
-					m.PutArray(eachVal.FieldByName("Int64").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Int64").Int())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Uint":
-					m.PutArray(eachVal.FieldByName("Uint").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Uint").Uint())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Uint8":
-					m.PutArray(eachVal.FieldByName("Uint8").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Uint8").Uint())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Uint16":
-					m.PutArray(eachVal.FieldByName("Uint16").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Uint16").Uint())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Uint32":
-					m.PutArray(eachVal.FieldByName("Uint32").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Uint32").Uint())
+					} else {
+						m.PutArray(0)
+					}
 				case "null.Uint64":
-					m.PutArray(eachVal.FieldByName("Uint64").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.PutArray(eachVal.FieldByName("Uint64").Uint())
+					} else {
+						m.PutArray(0)
+					}
 				default:
 					sJson := New()
 					sJson.SetToObject()
@@ -221,33 +277,89 @@ func (m *JSON) fromFieldsValue(val reflect.Value, tags ...string) {
 
 				switch eachType.Type.String() {
 				case "null.String":
-					m.Put(eachTag, eachVal.FieldByName("String").String())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("String").String())
+					} else {
+						m.Put(eachTag, "")
+					}
 				case "null.Bool":
-					m.Put(eachTag, eachVal.FieldByName("Bool").Bool())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Bool").Bool())
+					} else {
+						m.Put(eachTag, false)
+					}
 				case "null.Float32":
-					m.Put(eachTag, eachVal.FieldByName("Float32").Float())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Float32").Float())
+					} else {
+						m.Put(eachTag, float32(0.0))
+					}
 				case "null.Float64":
-					m.Put(eachTag, eachVal.FieldByName("Float64").Float())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Float64").Float())
+					} else {
+						m.Put(eachTag, float64(0.0))
+					}
 				case "null.Int":
-					m.Put(eachTag, eachVal.FieldByName("Int").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Int").Int())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Int8":
-					m.Put(eachTag, eachVal.FieldByName("Int8").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Int8").Int())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Int16":
-					m.Put(eachTag, eachVal.FieldByName("Int16").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Int16").Int())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Int32":
-					m.Put(eachTag, eachVal.FieldByName("Int32").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Int32").Int())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Int64":
-					m.Put(eachTag, eachVal.FieldByName("Int64").Int())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Int64").Int())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Uint":
-					m.Put(eachTag, eachVal.FieldByName("Uint").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Uint").Uint())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Uint8":
-					m.Put(eachTag, eachVal.FieldByName("Uint8").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Uint8").Uint())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Uint16":
-					m.Put(eachTag, eachVal.FieldByName("Uint16").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Uint16").Uint())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Uint32":
-					m.Put(eachTag, eachVal.FieldByName("Uint32").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Uint32").Uint())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				case "null.Uint64":
-					m.Put(eachTag, eachVal.FieldByName("Uint64").Uint())
+					if eachVal.FieldByName("Valid").Bool() {
+						m.Put(eachTag, eachVal.FieldByName("Uint64").Uint())
+					} else {
+						m.Put(eachTag, 0)
+					}
 				default:
 					sJson := New()
 					sJson.SetToObject()
@@ -323,33 +435,33 @@ func (m *JSON) fromFieldsValue(val reflect.Value, tags ...string) {
 			case nil:
 				m.Put(eachKey, t)
 			case null.String:
-				m.Put(eachKey, t.String)
+				m.Put(eachKey, t)
 			case null.Bool:
-				m.Put(eachKey, t.Bool)
+				m.Put(eachKey, t)
 			case null.Int:
-				m.Put(eachKey, t.Int)
+				m.Put(eachKey, t)
 			case null.Int8:
-				m.Put(eachKey, t.Int8)
+				m.Put(eachKey, t)
 			case null.Int16:
-				m.Put(eachKey, t.Int16)
+				m.Put(eachKey, t)
 			case null.Int32:
-				m.Put(eachKey, t.Int32)
+				m.Put(eachKey, t)
 			case null.Int64:
-				m.Put(eachKey, t.Int64)
+				m.Put(eachKey, t)
 			case null.Uint:
-				m.Put(eachKey, t.Uint)
+				m.Put(eachKey, t)
 			case null.Uint8:
-				m.Put(eachKey, t.Uint8)
+				m.Put(eachKey, t)
 			case null.Uint16:
-				m.Put(eachKey, t.Uint16)
+				m.Put(eachKey, t)
 			case null.Uint32:
-				m.Put(eachKey, t.Uint32)
+				m.Put(eachKey, t)
 			case null.Uint64:
-				m.Put(eachKey, t.Uint64)
+				m.Put(eachKey, t)
 			case null.Float32:
-				m.Put(eachKey, t.Float32)
+				m.Put(eachKey, t)
 			case null.Float64:
-				m.Put(eachKey, t.Float64)
+				m.Put(eachKey, t)
 			default:
 
 				skind := reflect.ValueOf(t).Type().Kind()

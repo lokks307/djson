@@ -66,33 +66,89 @@ func (m *DA) ReplaceAt(idx int, value interface{}) *DA {
 
 	switch t := value.(type) {
 	case null.String:
-		m.Element[idx] = t.String
+		if t.Valid {
+			m.Element[idx] = t.String
+		} else {
+			m.Element[idx] = ""
+		}
 	case null.Bool:
-		m.Element[idx] = t.Bool
+		if t.Valid {
+			m.Element[idx] = t.Bool
+		} else {
+			m.Element[idx] = false
+		}
 	case null.Int:
-		m.Element[idx] = t.Int
+		if t.Valid {
+			m.Element[idx] = t.Int
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Int8:
-		m.Element[idx] = t.Int8
+		if t.Valid {
+			m.Element[idx] = t.Int8
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Int16:
-		m.Element[idx] = t.Int16
+		if t.Valid {
+			m.Element[idx] = t.Int16
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Int32:
-		m.Element[idx] = t.Int32
+		if t.Valid {
+			m.Element[idx] = t.Int32
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Int64:
-		m.Element[idx] = t.Int64
+		if t.Valid {
+			m.Element[idx] = t.Int64
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Uint:
-		m.Element[idx] = t.Uint
+		if t.Valid {
+			m.Element[idx] = t.Uint
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Uint8:
-		m.Element[idx] = t.Uint8
+		if t.Valid {
+			m.Element[idx] = t.Uint8
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Uint16:
-		m.Element[idx] = t.Uint16
+		if t.Valid {
+			m.Element[idx] = t.Uint16
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Uint32:
-		m.Element[idx] = t.Uint32
+		if t.Valid {
+			m.Element[idx] = t.Uint32
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Uint64:
-		m.Element[idx] = t.Uint64
+		if t.Valid {
+			m.Element[idx] = t.Uint64
+		} else {
+			m.Element[idx] = 0
+		}
 	case null.Float32:
-		m.Element[idx] = t.Float32
+		if t.Valid {
+			m.Element[idx] = t.Float32
+		} else {
+			m.Element[idx] = float32(0.0)
+		}
 	case null.Float64:
-		m.Element[idx] = t.Float64
+		if t.Valid {
+			m.Element[idx] = t.Float64
+		} else {
+			m.Element[idx] = float64(0.0)
+		}
 	case *DA:
 		m.Element[idx] = t
 	case *DO:

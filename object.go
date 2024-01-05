@@ -54,33 +54,89 @@ func (m *DO) Put(key string, value interface{}) *DO {
 
 	switch t := value.(type) {
 	case null.String:
-		m.Map[key] = t.String
+		if t.Valid {
+			m.Map[key] = t.String
+		} else {
+			m.Map[key] = ""
+		}
 	case null.Bool:
-		m.Map[key] = t.Bool
+		if t.Valid {
+			m.Map[key] = t.Bool
+		} else {
+			m.Map[key] = false
+		}
 	case null.Int:
-		m.Map[key] = t.Int
+		if t.Valid {
+			m.Map[key] = t.Int
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Int8:
-		m.Map[key] = t.Int8
+		if t.Valid {
+			m.Map[key] = t.Int8
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Int16:
-		m.Map[key] = t.Int16
+		if t.Valid {
+			m.Map[key] = t.Int16
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Int32:
-		m.Map[key] = t.Int32
+		if t.Valid {
+			m.Map[key] = t.Int32
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Int64:
-		m.Map[key] = t.Int64
+		if t.Valid {
+			m.Map[key] = t.Int64
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Uint:
-		m.Map[key] = t.Uint
+		if t.Valid {
+			m.Map[key] = t.Uint
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Uint8:
-		m.Map[key] = t.Uint8
+		if t.Valid {
+			m.Map[key] = t.Uint8
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Uint16:
-		m.Map[key] = t.Uint16
+		if t.Valid {
+			m.Map[key] = t.Uint16
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Uint32:
-		m.Map[key] = t.Uint32
+		if t.Valid {
+			m.Map[key] = t.Uint32
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Uint64:
-		m.Map[key] = t.Uint64
+		if t.Valid {
+			m.Map[key] = t.Uint64
+		} else {
+			m.Map[key] = 0
+		}
 	case null.Float32:
-		m.Map[key] = t.Float32
+		if t.Valid {
+			m.Map[key] = t.Float32
+		} else {
+			m.Map[key] = float32(0.0)
+		}
 	case null.Float64:
-		m.Map[key] = t.Float64
+		if t.Valid {
+			m.Map[key] = t.Float64
+		} else {
+			m.Map[key] = float64(0.0)
+		}
 	case DO:
 		m.Map[key] = &t
 	case DA:

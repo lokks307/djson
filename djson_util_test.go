@@ -680,9 +680,10 @@ func TestSyntax25(t *testing.T) {
 
 func TestSyntax26(t *testing.T) {
 	type User struct {
-		Id    string      `json:"id"`
-		Name  string      `json:"name"`
-		Email null.String `json:"email"`
+		Id      string      `json:"id"`
+		Name    string      `json:"name"`
+		Email   null.String `json:"email"`
+		Address null.String `json:"address"`
 	}
 
 	var user = User{
@@ -692,15 +693,18 @@ func TestSyntax26(t *testing.T) {
 			String: "longa@test.com",
 			Valid:  true,
 		},
+		Address: null.String{
+			String: "Area51",
+			Valid:  false,
+		},
 	}
 
 	mJson := New()
 	mJson.FromFields(user) // no tag
 
-	// must be like {"email":"longa@test.com","id":"id-1234","name":"Ricardo Longa"}
 	fmt.Println(mJson.ToString())
 
-	expectedJSON := `{"email":"longa@test.com","id":"id-1234","name":"Ricardo Longa"}`
+	expectedJSON := `{"address":"","email":"longa@test.com","id":"id-1234","name":"Ricardo Longa"}`
 	if result := mJson.ToString(); result != expectedJSON {
 		t.Errorf("Expected %s, but got %s", expectedJSON, result)
 	}
