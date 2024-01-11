@@ -9,7 +9,17 @@ import (
 
 	gov "github.com/asaskevich/govalidator"
 	"github.com/goccy/go-json"
+	"github.com/volatiletech/null/v8"
 )
+
+type supportedType interface {
+	string | bool | float32 | float64 |
+		int | int8 | int16 | int32 | int64 |
+		uint | uint8 | uint16 | uint32 | uint64 |
+		null.String | null.Bool | null.Float32 | null.Float64 |
+		null.Int | null.Int8 | null.Int16 | null.Int32 | null.Int64 |
+		null.Uint | null.Uint8 | null.Uint16 | null.Uint32 | null.Uint64
+}
 
 func MapToObject(dmap map[string]interface{}) *DO {
 	nObj := NewDO()
@@ -20,6 +30,12 @@ func MapToObject(dmap map[string]interface{}) *DO {
 }
 
 func SliceToArray(dslice []interface{}) *DA {
+	nArr := NewDA()
+	nArr.Put(dslice)
+	return nArr
+}
+
+func PremitiveSliceToArray[T supportedType](dslice []T) *DA {
 	nArr := NewDA()
 	nArr.Put(dslice)
 	return nArr
@@ -153,6 +169,12 @@ func IsBoolType(v interface{}) bool {
 
 func IsStringType(v interface{}) bool {
 	return IsInTypes(v, "string")
+}
+
+func IsSliceType(v interface{}) bool {
+	return IsInTypes(v,
+		"[]string", "[]bool", "[]int", "[]uint", "[]int8", "[]uint8", "[]int16", "[]uint16", "[]int32", "[]uint32", "[]int64", "[]uint64", "[]float32", "[]float64",
+		"[]null.String", "[]null.Bool", "[]null.Int", "[]null.Uint", "[]null.Int8", "[]null.Uint8", "[]null.Int16", "[]null.Uint16", "[]null.Int32", "[]null.Uint32", "[]null.Int64", "[]null.Uint64", "[]null.Float32", "[]null.Float64")
 }
 
 func IsInTypes(v interface{}, types ...string) bool {

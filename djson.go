@@ -324,7 +324,6 @@ func (m *JSON) Put(v ...interface{}) *JSON {
 			m._Object = nil
 			m._Type = ARRAY
 		}
-
 	case Array:
 		if m._Type == ARRAY {
 			m._Array.Put([]interface{}(t))
@@ -351,9 +350,23 @@ func (m *JSON) Put(v ...interface{}) *JSON {
 		}
 	case JSON:
 		m = &t
+
 	default:
+		if IsSliceType(v[0]) {
+			if m._Type == NULL {
+				m._Array = NewDA()
+				m._Array.Put(v[0])
+			}
+		}
+
 		if m._Type == ARRAY {
-			m._Array.Put(t)
+			m._Array.Put(v[0])
+		} else if m._Type == NULL {
+			if IsSliceType(v[0]) {
+				m._Array = NewDA()
+				m._Type = ARRAY
+				m._Array.Put(v[0])
+			}
 		}
 	}
 

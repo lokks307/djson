@@ -157,6 +157,62 @@ func (m *DO) Put(key string, value interface{}) *DO {
 		m.Map[key] = t.Interface()
 	case *JSON:
 		m.Map[key] = t.Interface()
+	case []string:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []bool:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []float32:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []float64:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []int:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []int8:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []int16:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []int32:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []int64:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []uint:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []uint8:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []uint16:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []uint32:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []uint64:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.String:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Bool:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Float32:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Float64:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Int:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Int8:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Int16:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Int32:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Int64:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Uint:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Uint8:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Uint16:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Uint32:
+		m.Map[key] = PremitiveSliceToArray(t)
+	case []null.Uint64:
+		m.Map[key] = PremitiveSliceToArray(t)
 	case nil:
 		m.Map[key] = nil
 	}

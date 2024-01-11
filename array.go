@@ -169,6 +169,62 @@ func (m *DA) ReplaceAt(idx int, value interface{}) *DA {
 		m.Element[idx] = t.Interface()
 	case *JSON:
 		m.Element[idx] = t.Interface()
+	case []string:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []bool:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []float32:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []float64:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []int:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []int8:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []int16:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []int32:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []int64:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []uint:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []uint8:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []uint16:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []uint32:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []uint64:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.String:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Bool:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Float32:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Float64:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Int:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Int8:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Int16:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Int32:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Int64:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Uint:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Uint8:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Uint16:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Uint32:
+		m.Element[idx] = PremitiveSliceToArray(t)
+	case []null.Uint64:
+		m.Element[idx] = PremitiveSliceToArray(t)
 	case nil:
 		m.Element[idx] = nil
 	}
@@ -195,9 +251,9 @@ func (m *DA) PutArray(value interface{}) *DA {
 	return m
 }
 
-func (m *DA) Put(value interface{}) *DA {
+func (m *DA) Put(v interface{}) *DA {
 
-	switch t := value.(type) {
+	switch t := v.(type) {
 	case *DA:
 		for idx := range t.Element {
 			m.Insert(m.Size(), t.Element[idx])
@@ -208,7 +264,11 @@ func (m *DA) Put(value interface{}) *DA {
 		}
 	case []interface{}:
 		for idx := range t {
-			m.Insert(m.Size(), t[idx])
+			if IsSliceType(t[idx]) {
+				m.PutArray(t[idx])
+			} else {
+				m.Insert(m.Size(), t[idx])
+			}
 		}
 	case []int:
 		for idx := range t {
@@ -323,7 +383,7 @@ func (m *DA) Put(value interface{}) *DA {
 			m.Insert(m.Size(), t[idx])
 		}
 	default:
-		m.Insert(m.Size(), value)
+		m.Insert(m.Size(), v)
 	}
 
 	return m
