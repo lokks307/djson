@@ -211,3 +211,25 @@ func TestValidator6(t *testing.T) {
 	}
 
 }
+
+func TestValidator7(t *testing.T) {
+
+	dv := NewValidator()
+	dv.Compile(`["EMAIL","EMPTY.STRING"]`)
+
+	asjon := New().Parse("11")
+	bsjon := New().Parse(`one@example.com`)
+
+	if dv.IsValid(asjon) {
+		log.Println("valid")
+	} else {
+		log.Println("not valid")
+	}
+
+	if dv.IsValid(bsjon) {
+		log.Println("valid")
+	} else {
+		log.Println("not valid")
+	}
+
+}

@@ -151,6 +151,8 @@ func (m *JSON) Parse(doc string) *JSON {
 
 	tdoc := strings.TrimSpace(doc)
 	if tdoc == "" {
+		m._Type = STRING
+		m._String = ""
 		return m
 	}
 

@@ -259,6 +259,10 @@ func GetVItem(name string, ejson *JSON) *VItem {
 			eitem.Type = V_TYPE_ARRAY
 			eitem.Min = 0
 			eitem.Max = int64(9007199254740991)
+		case "EMPTY.STRING":
+			eitem.Type = V_TYPE_STRING
+			eitem.Min = 0
+			eitem.Max = 0
 		case "NONEMPTY.STRING":
 			eitem.Type = V_TYPE_STRING
 			eitem.Min = 1
