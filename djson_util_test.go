@@ -740,3 +740,42 @@ func TestSyntax27(t *testing.T) {
 		t.Errorf("Expected %s, but got %s", expectedJSON, result)
 	}
 }
+
+func TestOmitEmpty(t *testing.T) {
+	type Name struct {
+		First  string      `json:"first,omitempty"`
+		Middle null.String `json:"middle,omitempty"`
+		Family string      `json:"family"`
+	}
+
+	type User struct {
+		Name    interface{} `json:"name,omitempty"`
+		Address string      `json:"address"`
+	}
+
+	userName := Name{
+		First:  "Ricardo",
+		Family: "Longa",
+		Middle: null.String{
+			String: "Legend",
+			Valid:  false,
+		},
+	}
+
+	//mJson := New()
+	//mJson.FromFields(userName) // tag has depth concept
+
+	// must be like {"email":"longa@test.com","name":{"first":"Ricardo"}}
+	//fmt.Println(mJson.ToString())
+
+	user := User{
+		Name:    userName,
+		Address: "South Korea",
+	}
+
+	bJson := New()
+	bJson.FromFields(user) // tag has depth concept
+
+	fmt.Println(bJson.ToString())
+
+}

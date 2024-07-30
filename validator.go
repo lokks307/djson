@@ -19,6 +19,12 @@ const (
 	V_TYPE_MULTI
 )
 
+var MAX_STR_LEN int64 = 2097152 // .NET JavaScriptSerializer.MaxJsonLength
+
+func SetMaxJsonLength(maxLen int64) {
+	MAX_STR_LEN = maxLen
+}
+
 var CountryCodes = []string{
 	"GH", "GA", "GY", "GM", "GG", "GP", "GT", "GU", "GD", "GR", "GL", "GW", "GN", "NA", "NR", "NG", "AQ", "SS", "ZA", "AN", "NL",
 	"NP", "NO", "NF", "NC", "NZ", "NU", "NE", "NI", "KR", "DK", "DO", "DM", "DE", "TL", "LA", "LR", "LV", "RU", "LB", "LS", "RE",
@@ -252,7 +258,7 @@ func GetVItem(name string, ejson *JSON) *VItem {
 		case "STRING":
 			eitem.Type = V_TYPE_STRING
 			eitem.Min = 0
-			eitem.Max = 8192
+			eitem.Max = MAX_STR_LEN
 		case "OBJECT":
 			eitem.Type = V_TYPE_OBJECT
 		case "ARRAY":
@@ -266,7 +272,7 @@ func GetVItem(name string, ejson *JSON) *VItem {
 		case "NONEMPTY.STRING":
 			eitem.Type = V_TYPE_STRING
 			eitem.Min = 1
-			eitem.Max = 8192
+			eitem.Max = MAX_STR_LEN
 		case "NONEMPTY.ARRAY":
 			eitem.Type = V_TYPE_ARRAY
 			eitem.Min = 1
@@ -274,17 +280,17 @@ func GetVItem(name string, ejson *JSON) *VItem {
 		case "BIN":
 			eitem.Type = V_TYPE_STRING
 			eitem.Min = 0
-			eitem.Max = 8192
+			eitem.Max = MAX_STR_LEN
 			eitem.CheckFunc = CheckFuncBin
 		case "DEC":
 			eitem.Type = V_TYPE_STRING
 			eitem.Min = 0
-			eitem.Max = 8192
+			eitem.Max = MAX_STR_LEN
 			eitem.CheckFunc = CheckFuncDec
 		case "HEX":
 			eitem.Type = V_TYPE_STRING
 			eitem.Min = 0
-			eitem.Max = 8192
+			eitem.Max = MAX_STR_LEN
 			eitem.CheckFunc = CheckFuncHex
 		case "BOOL":
 			eitem.Type = V_TYPE_BOOL
@@ -338,12 +344,12 @@ func GetVItem(name string, ejson *JSON) *VItem {
 				eitem.Max = eitem.Min
 			} else {
 				eitem.Min = ejson.Int("min", 0)
-				eitem.Max = ejson.Int("max", 8192)
+				eitem.Max = ejson.Int("max", MAX_STR_LEN)
 			}
 		case "MIN.MAX.STRING":
 			eitem.Type = V_TYPE_STRING
 			eitem.Min = ejson.Int("min", 0)
-			eitem.Max = ejson.Int("max", 8192)
+			eitem.Max = ejson.Int("max", MAX_STR_LEN)
 			eitem.CheckFunc = CheckFuncMinMaxString
 		case "OBJECT":
 			subJson, ok := ejson.Object("object")
@@ -368,7 +374,7 @@ func GetVItem(name string, ejson *JSON) *VItem {
 				eitem.Max = eitem.Min
 			} else {
 				eitem.Min = ejson.Int("min", 1)
-				eitem.Max = ejson.Int("max", 8192)
+				eitem.Max = ejson.Int("max", MAX_STR_LEN)
 			}
 
 			if eitem.Min < 1 {
@@ -417,7 +423,7 @@ func GetVItem(name string, ejson *JSON) *VItem {
 				eitem.Max = eitem.Min
 			} else {
 				eitem.Min = ejson.Int("min", 0)
-				eitem.Max = ejson.Int("max", 8192)
+				eitem.Max = ejson.Int("max", MAX_STR_LEN)
 			}
 		}
 
@@ -509,7 +515,7 @@ func GetVItem(name string, ejson *JSON) *VItem {
 	case "BASE64":
 		eitem.Type = V_TYPE_STRING
 		eitem.Min = 0
-		eitem.Max = 8192
+		eitem.Max = MAX_STR_LEN
 		eitem.CheckFunc = CheckBase64
 	case "TELEPHONE":
 		eitem.Type = V_TYPE_STRING
@@ -605,15 +611,15 @@ func CheckVItem(vi *VItem, tjson *JSON) bool {
 			return false
 		}
 
-	case V_TYPE_NUMBER:
-		if vtype != "float" && vtype != "int" {
+	case V_TYPE_FLOAT:
+		if vtype != "float" {
 			return false
 		}
 
 		fallthrough
 
-	case V_TYPE_FLOAT:
-		if vtype != "float" {
+	case V_TYPE_NUMBER:
+		if !(vtype == "float" || vtype == "int") {
 			return false
 		}
 

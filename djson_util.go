@@ -140,6 +140,10 @@ func (m *JSON) fromFieldsValue(val reflect.Value, tags ...string) {
 
 	kind := val.Type().Kind()
 
+	if kind == reflect.Interface {
+		// TODO:
+	}
+
 	if kind == reflect.Array || kind == reflect.Slice {
 
 		for i := 0; i < val.Len(); i++ {
@@ -263,129 +267,147 @@ func (m *JSON) fromFieldsValue(val reflect.Value, tags ...string) {
 	} else if kind == reflect.Struct {
 
 		for i := 0; i < val.NumField(); i++ {
+
 			eachVal := val.Field(i)
 			eachType := val.Type().Field(i)
-			eachTag := eachType.Tag.Get("json")
+			eachKind := eachType.Type.Kind()
 
-			if len(tags) > 0 && !inTags(eachTag, tags...) {
+			if eachKind == reflect.Pointer && eachVal.IsNil() {
 				continue
 			}
 
-			eachKind := eachType.Type.Kind()
+			eachTagName := eachType.Tag.Get("json")
+			tagList := strings.Split(eachTagName, ",")
+			tagName := tagList[0]
+
+			if tagName == "" {
+				continue
+			}
+
+			if eachKind == reflect.Pointer || eachKind == reflect.Interface {
+				eachKind = reflect.Indirect(reflect.ValueOf(eachVal)).Type().Kind()
+				eachVal = reflect.Indirect(eachVal)
+			}
+
+			if len(tags) > 0 && !inTags(tagName, tags...) {
+				continue
+			}
+
+			omitEmpty := hasOmitEmpty(tagList...)
 
 			if eachKind == reflect.Struct || eachKind == reflect.Map {
 
 				switch eachType.Type.String() {
 				case "null.String":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("String").String())
-					} else {
-						m.Put(eachTag, "")
+						m.Put(tagName, eachVal.FieldByName("String").String())
+					} else if !omitEmpty {
+						m.Put(tagName, "")
 					}
 				case "null.Bool":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Bool").Bool())
-					} else {
-						m.Put(eachTag, false)
+						m.Put(tagName, eachVal.FieldByName("Bool").Bool())
+					} else if !omitEmpty {
+						m.Put(tagName, false)
 					}
 				case "null.Float32":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Float32").Float())
-					} else {
-						m.Put(eachTag, float32(0.0))
+						m.Put(tagName, eachVal.FieldByName("Float32").Float())
+					} else if !omitEmpty {
+						m.Put(tagName, float32(0.0))
 					}
 				case "null.Float64":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Float64").Float())
-					} else {
-						m.Put(eachTag, float64(0.0))
+						m.Put(tagName, eachVal.FieldByName("Float64").Float())
+					} else if !omitEmpty {
+						m.Put(tagName, float64(0.0))
 					}
 				case "null.Int":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Int").Int())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Int").Int())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Int8":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Int8").Int())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Int8").Int())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Int16":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Int16").Int())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Int16").Int())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Int32":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Int32").Int())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Int32").Int())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Int64":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Int64").Int())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Int64").Int())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Uint":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Uint").Uint())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Uint").Uint())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Uint8":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Uint8").Uint())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Uint8").Uint())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Uint16":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Uint16").Uint())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Uint16").Uint())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Uint32":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Uint32").Uint())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Uint32").Uint())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				case "null.Uint64":
 					if eachVal.FieldByName("Valid").Bool() {
-						m.Put(eachTag, eachVal.FieldByName("Uint64").Uint())
-					} else {
-						m.Put(eachTag, 0)
+						m.Put(tagName, eachVal.FieldByName("Uint64").Uint())
+					} else if !omitEmpty {
+						m.Put(tagName, 0)
 					}
 				default:
 					sJson := New()
 					sJson.SetToObject()
 					sJson.fromFieldsValue(eachVal, downDepthWW(tags)...)
-					m.Put(eachTag, sJson)
+					m.Put(tagName, sJson)
 				}
 			} else if eachKind == reflect.Array || eachKind == reflect.Slice {
 
 				sJson := New()
 				sJson.SetToArray()
 				sJson.fromFieldsValue(eachVal, downDepthWW(tags)...)
-				m.Put(eachTag, sJson)
+				m.Put(tagName, sJson)
 
 			} else {
 
 				switch eachType.Type.String() {
 				case "int", "int8", "int16", "int32", "int64":
-					m.Put(eachTag, eachVal.Int())
+					m.Put(tagName, eachVal.Int())
 				case "uint", "uint8", "uint16", "uint32", "uint64":
-					m.Put(eachTag, eachVal.Uint())
+					m.Put(tagName, eachVal.Uint())
 				case "float32", "float64":
-					m.Put(eachTag, eachVal.Float())
+					m.Put(tagName, eachVal.Float())
 				case "string":
-					m.Put(eachTag, eachVal.String())
+					m.Put(tagName, eachVal.String())
 				case "bool":
-					m.Put(eachTag, eachVal.Bool())
+					m.Put(tagName, eachVal.Bool())
 				}
 			}
 		}
@@ -518,6 +540,16 @@ func inTags(idv string, tags ...string) bool {
 	for idx := range tags {
 		tmp := strings.Split(tags[idx], ".")
 		if tmp[0] == idv {
+			return true
+		}
+	}
+
+	return false
+}
+
+func hasOmitEmpty(vv ...string) bool {
+	for _, v := range vv {
+		if v == "omitempty" {
 			return true
 		}
 	}
