@@ -1,9 +1,47 @@
 package djson
 
 import (
+	"fmt"
 	"log"
 	"testing"
 )
+
+func TestJsonPut(t *testing.T) {
+
+	var nilDo *DO
+	var nilDa *DA
+	var nilJson *JSON
+
+	js := New()
+	js.Put(New())
+	js.Put(NewDO())
+	js.Put(NewDA())
+	js.Put(nilJson)
+	js.Put(nilDo)
+	js.Put(nilDa)
+
+	fmt.Println(js.ToString())
+
+	js2 := New().Put(Object{
+		"name":  "Ricardo Longa",
+		"idade": 28,
+	})
+
+	js3 := New().Put(Object{
+		"address": "homeless",
+	})
+
+	js2.Put(js3)
+
+	fmt.Println(js2.ToString())
+
+	js4 := New().Put([]int{1, 2, 3, 4})
+	js5 := New().Put([]int{5, 6})
+	js4.Put(js5)
+
+	fmt.Println(js4.ToString())
+
+}
 
 func TestParseJson(t *testing.T) {
 	jsonDoc := `{

@@ -279,80 +279,137 @@ func (m *JSON) Put(v ...interface{}) *JSON {
 
 	switch t := v[0].(type) {
 	case map[string]interface{}:
-		if m._Type == OBJECT {
-			for key := range t {
-				m._Object.Put(key, t[key])
+		if t != nil {
+			if m._Type == OBJECT {
+				if m._Object == nil {
+					m._Object = NewDO()
+				}
+				for key := range t {
+					m._Object.Put(key, t[key])
+				}
+			} else if m._Type == NULL {
+				m._Object = MapToObject(t)
+				m._Array = nil
+				m._Type = OBJECT
 			}
-		} else {
-			m._Object = MapToObject(t)
-			m._Array = nil
-			m._Type = OBJECT
 		}
 	case Object:
-		if m._Type == OBJECT {
-			for key := range map[string]interface{}(t) {
-				m._Object.Put(key, t[key])
+		if t != nil {
+			if m._Type == OBJECT {
+				if m._Object == nil {
+					m._Object = NewDO()
+				}
+				for key := range map[string]interface{}(t) {
+					m._Object.Put(key, t[key])
+				}
+			} else if m._Type == NULL {
+				m._Object = MapToObject(t)
+				m._Array = nil
+				m._Type = OBJECT
 			}
-		} else {
-			m._Object = MapToObject(t)
-			m._Array = nil
-			m._Type = OBJECT
 		}
 	case *DO:
-		if m._Type == OBJECT {
-			for key := range t.Map {
-				m._Object.Put(key, t.Map[key])
+		if t != nil {
+			if m._Type == OBJECT {
+				if m._Object == nil {
+					m._Object = NewDO()
+				}
+				for key := range t.Map {
+					m._Object.Put(key, t.Map[key])
+				}
+			} else if m._Type == NULL {
+				m._Object = t
+				m._Array = nil
+				m._Type = OBJECT
 			}
-		} else {
-			m._Object = t
-			m._Array = nil
-			m._Type = OBJECT
 		}
 	case DO:
 		if m._Type == OBJECT {
+			if m._Object == nil {
+				m._Object = NewDO()
+			}
 			for key := range t.Map {
 				m._Object.Put(key, t.Map[key])
 			}
-		} else {
+		} else if m._Type == NULL {
 			m._Object = &t
 			m._Array = nil
 			m._Type = OBJECT
 		}
 	case []interface{}:
 		if m._Type == ARRAY {
+			if m._Array == nil {
+				m._Array = NewDA()
+			}
 			m._Array.Put(t)
-		} else {
+		} else if m._Type == NULL {
 			m._Array = SliceToArray(t)
 			m._Object = nil
 			m._Type = ARRAY
 		}
 	case Array:
 		if m._Type == ARRAY {
+			if m._Array == nil {
+				m._Array = NewDA()
+			}
 			m._Array.Put([]interface{}(t))
-		} else {
-			m._Array = SliceToArray(t)
-			m._Object = nil
-			m._Type = ARRAY
 		}
 	case *DA:
-		if m._Type == ARRAY {
-			m._Array.Put(t.Element)
-		} else {
-			m._Array = t
-			m._Object = nil
-			m._Type = ARRAY
+		if t != nil {
+			if m._Type == ARRAY {
+				if m._Array == nil {
+					m._Array = NewDA()
+				}
+				m._Array.Put(t.Element)
+			} else if m._Type == NULL {
+				m._Array = t
+				m._Object = nil
+				m._Type = ARRAY
+			}
 		}
 	case DA:
 		if m._Type == ARRAY {
+			if m._Array == nil {
+				m._Array = NewDA()
+			}
 			m._Array.Put(t.Element)
-		} else {
+		} else if m._Type == NULL {
 			m._Array = &t
 			m._Object = nil
 			m._Type = ARRAY
 		}
 	case JSON:
-		m = &t
+		if m._Type == NULL {
+			m = &t
+		} else if m._Type == ARRAY && t._Type == ARRAY {
+			if m._Array == nil {
+				m._Array = NewDA()
+			}
+			m._Array.Put(t._Array)
+		} else if m._Type == OBJECT && t._Type == OBJECT && t._Object != nil {
+			if m._Object == nil {
+				m._Object = NewDO()
+			}
+			for key := range t._Object.Map {
+				m._Object.Put(key, t._Object.Map[key])
+			}
+		}
 
+	case *JSON:
+		if t != nil {
+			if m._Type == NULL {
+				m = t
+			} else if m._Type == ARRAY && t._Type == ARRAY {
+				m._Array.Put(t._Array)
+			} else if m._Type == OBJECT && t._Type == OBJECT && t._Object != nil {
+				if m._Object == nil {
+					m._Object = NewDO()
+				}
+				for key := range t._Object.Map {
+					m._Object.Put(key, t._Object.Map[key])
+				}
+			}
+		}
 	default:
 		if IsSliceType(v[0]) {
 			if m._Type == NULL {
@@ -382,6 +439,9 @@ func (m *JSON) PutArray(value ...interface{}) *JSON {
 	}
 
 	if m._Type == ARRAY {
+		if m._Array == nil {
+			m._Array = NewDA()
+		}
 		m._Array.Put(value)
 	}
 
@@ -395,6 +455,9 @@ func (m *JSON) PutObject(key string, value interface{}) *JSON {
 	}
 
 	if m._Type == OBJECT {
+		if m._Object == nil {
+			m._Object = NewDO()
+		}
 		m._Object.Put(key, value)
 	}
 
@@ -436,20 +499,19 @@ func (m *JSON) Interface(key ...interface{}) interface{} {
 		}
 
 		return nil
-	} else {
+	}
 
-		switch tkey := key[0].(type) {
-		case string:
-			if m._Type == OBJECT {
-				if obj, ok := m._Object.Get(tkey); ok {
-					return obj
-				}
+	switch tkey := key[0].(type) {
+	case string:
+		if m._Type == OBJECT {
+			if obj, ok := m._Object.Get(tkey); ok {
+				return obj
 			}
-		case int:
-			if m._Type == ARRAY {
-				if arr, ok := m._Array.Get(tkey); ok {
-					return arr
-				}
+		}
+	case int:
+		if m._Type == ARRAY {
+			if arr, ok := m._Array.Get(tkey); ok {
+				return arr
 			}
 		}
 	}
@@ -460,68 +522,68 @@ func (m *JSON) Interface(key ...interface{}) interface{} {
 func (m *JSON) Get(key ...interface{}) (*JSON, bool) {
 	if IsEmptyArg(key) {
 		return m, true
-	} else {
-
-		r := New()
-		var element interface{}
-		var retOk bool
-
-		switch tkey := key[0].(type) {
-		case string:
-			if m._Type == OBJECT {
-				element, retOk = m._Object.Get(tkey)
-			}
-		case int:
-			if m._Type == ARRAY {
-				element, retOk = m._Array.Get(tkey)
-			}
-		}
-
-		if !retOk {
-			return nil, false
-		}
-
-		eVal := reflect.ValueOf(element)
-
-		switch t := element.(type) {
-		case nil:
-			r._Type = NULL
-		case string:
-			r._String = t
-			r._Type = STRING
-		case bool:
-			r._Bool = t
-			r._Type = BOOL
-		case uint8, uint16, uint32, uint64, uint:
-			intVal := int64(eVal.Uint())
-			r._Int = intVal
-			r._Type = INT
-		case int8, int16, int32, int64, int:
-			intVal := eVal.Int()
-			r._Int = intVal
-			r._Type = INT
-		case float32, float64:
-			floatVal := eVal.Float()
-			r._Float = floatVal
-			r._Type = FLOAT
-		case DA:
-			r._Array = &t
-			r._Type = ARRAY
-		case DO:
-			r._Object = &t
-			r._Type = OBJECT
-		case *DA:
-			r._Array = t
-			r._Type = ARRAY
-		case *DO:
-			r._Object = t
-			r._Type = OBJECT
-		default:
-			return nil, false
-		}
-
-		return r, true
 	}
+
+	r := New()
+	var element interface{}
+	var retOk bool
+
+	switch tkey := key[0].(type) {
+	case string:
+		if m._Type == OBJECT {
+			element, retOk = m._Object.Get(tkey)
+		}
+	case int:
+		if m._Type == ARRAY {
+			element, retOk = m._Array.Get(tkey)
+		}
+	}
+
+	if !retOk {
+		return nil, false
+	}
+
+	eVal := reflect.ValueOf(element)
+
+	switch t := element.(type) {
+	case nil:
+		r._Type = NULL
+	case string:
+		r._String = t
+		r._Type = STRING
+	case bool:
+		r._Bool = t
+		r._Type = BOOL
+	case uint8, uint16, uint32, uint64, uint:
+		intVal := int64(eVal.Uint())
+		r._Int = intVal
+		r._Type = INT
+	case int8, int16, int32, int64, int:
+		intVal := eVal.Int()
+		r._Int = intVal
+		r._Type = INT
+	case float32, float64:
+		floatVal := eVal.Float()
+		r._Float = floatVal
+		r._Type = FLOAT
+	case DA:
+		r._Array = &t
+		r._Type = ARRAY
+	case DO:
+		r._Object = &t
+		r._Type = OBJECT
+	case *DA:
+		r._Array = t
+		r._Type = ARRAY
+	case *DO:
+		r._Object = t
+		r._Type = OBJECT
+	default:
+		return nil, false
+	}
+
+	return r, true
+
 }
 
 // The DJSON as return shared Object.
@@ -688,35 +750,34 @@ func (m *JSON) Bool(key ...interface{}) bool {
 			return m._Bool
 		}
 
-	} else {
-
-		var dv bool
-
-		if len(key) >= 2 {
-			dv = key[1].(bool)
-		}
-
-		switch tkey := key[0].(type) {
-		case string:
-			if m._Type == OBJECT {
-				if bVal, ok := m._Object.Bool(tkey); ok {
-					return bVal
-				}
-			}
-		default:
-			kint, ok := getIntBase(key[0])
-			if ok && m._Type == ARRAY {
-				if bVal, ok := m._Array.Bool(int(kint)); ok {
-					return bVal
-				}
-			}
-		}
-
-		return dv
+		return false // zero
 
 	}
 
-	return false // zero value
+	var dv bool
+
+	if len(key) >= 2 {
+		dv = key[1].(bool)
+	}
+
+	switch tkey := key[0].(type) {
+	case string:
+		if m._Type == OBJECT {
+			if bVal, ok := m._Object.Bool(tkey); ok {
+				return bVal
+			}
+		}
+	default:
+		kint, ok := getIntBase(key[0])
+		if ok && m._Type == ARRAY {
+			if bVal, ok := m._Array.Bool(int(kint)); ok {
+				return bVal
+			}
+		}
+	}
+
+	return dv
+
 }
 
 func (m *JSON) Float(key ...interface{}) float64 {
@@ -741,79 +802,79 @@ func (m *JSON) Float(key ...interface{}) float64 {
 			return m._Float
 		}
 
-	} else {
+		return 0 // zero value
 
-		var dv float64
-
-		if len(key) >= 2 {
-			v, ok := getFloatBase(key[1])
-			if ok {
-				dv = v
-			}
-		}
-
-		switch tkey := key[0].(type) {
-		case string:
-			if m._Type == OBJECT {
-				if fVal, ok := m._Object.Float(tkey); ok {
-					return fVal
-				}
-			}
-		default:
-			kint, ok := getIntBase(key[0])
-			if ok && m._Type == ARRAY {
-				if fVal, ok := m._Array.Float(int(kint)); ok {
-					return fVal
-				}
-			}
-		}
-
-		return dv
 	}
 
-	return 0 // zero value
+	var dv float64
+
+	if len(key) >= 2 {
+		v, ok := getFloatBase(key[1])
+		if ok {
+			dv = v
+		}
+	}
+
+	switch tkey := key[0].(type) {
+	case string:
+		if m._Type == OBJECT {
+			if fVal, ok := m._Object.Float(tkey); ok {
+				return fVal
+			}
+		}
+	default:
+		kint, ok := getIntBase(key[0])
+		if ok && m._Type == ARRAY {
+			if fVal, ok := m._Array.Float(int(kint)); ok {
+				return fVal
+			}
+		}
+	}
+
+	return dv
+
 }
 
 func (m *JSON) String(key ...interface{}) string {
 
 	if IsEmptyArg(key) {
 		return m.ToString()
-	} else {
-		var dv string
+	}
 
-		if len(key) >= 2 {
-			dv = key[1].(string)
+	var dv string
+
+	if len(key) >= 2 {
+		dv = key[1].(string)
+	}
+
+	switch tkey := key[0].(type) {
+	case string:
+		if m._Type == OBJECT {
+			if m._Object.HasKey(tkey) {
+				return m._Object.String(tkey)
+			} else {
+				return dv
+			}
+		} else {
+			return tkey // maybe default
 		}
-
-		switch tkey := key[0].(type) {
-		case string:
-			if m._Type == OBJECT {
-				if m._Object.HasKey(tkey) {
-					return m._Object.String(tkey)
+	default:
+		kint, ok := getIntBase(key[0])
+		if ok {
+			if m._Type == ARRAY {
+				if iVal, ok := m._Array.String2(int(kint)); ok {
+					return iVal
 				} else {
 					return dv
 				}
 			} else {
-				return tkey // maybe default
-			}
-		default:
-			kint, ok := getIntBase(key[0])
-			if ok {
-				if m._Type == ARRAY {
-					if iVal, ok := m._Array.String2(int(kint)); ok {
-						return iVal
-					} else {
-						return dv
-					}
-				} else {
-					return strconv.Itoa(int(kint)) // maybe default
-				}
+				return strconv.Itoa(int(kint)) // maybe default
 			}
 		}
-
-		return dv
-
 	}
+
+	return dv
+
 }
 
 func (m *JSON) ToString() string {
@@ -891,51 +952,53 @@ func (m *JSON) Next() bool {
 }
 
 func (m *JSON) Scan() *JSON {
-	if m._Type == ARRAY {
-		v, ok := m._Array.Scan()
-		if !ok {
-			return nil
-		}
-
-		ret := New()
-		switch t := v.(type) {
-		case string:
-			ret._Type = STRING
-			ret._String = t
-		case bool:
-			ret._Type = BOOL
-			ret._Bool = t
-		case int, int8, int16, int32, int64:
-			ret._Type = INT
-			ret._Int = reflect.ValueOf(t).Int()
-		case uint, uint8, uint16, uint32, uint64:
-			ret._Type = INT
-			ret._Int = int64(reflect.ValueOf(t).Uint())
-		case float32, float64:
-			ret._Type = FLOAT
-			ret._Float = reflect.ValueOf(t).Float()
-		case *DA:
-			ret._Type = ARRAY
-			ret._Array = t
-		case *DO:
-			ret._Type = OBJECT
-			ret._Object = t
-		case DA:
-			ret._Type = ARRAY
-			ret._Array = &t
-		case DO:
-			ret._Type = OBJECT
-			ret._Object = &t
-		case *JSON:
-			ret = t
-		case JSON:
-			ret = &t
-		case nil:
-			ret._Type = NULL
-		}
-
-		return ret
+	if m._Type != ARRAY {
+		return nil
 	}
 
-	return nil
+	v, ok := m._Array.Scan()
+	if !ok {
+		return nil
+	}
+
+	ret := New()
+
+	switch t := v.(type) {
+	case string:
+		ret._Type = STRING
+		ret._String = t
+	case bool:
+		ret._Type = BOOL
+		ret._Bool = t
+	case int, int8, int16, int32, int64:
+		ret._Type = INT
+		ret._Int = reflect.ValueOf(t).Int()
+	case uint, uint8, uint16, uint32, uint64:
+		ret._Type = INT
+		ret._Int = int64(reflect.ValueOf(t).Uint())
+	case float32, float64:
+		ret._Type = FLOAT
+		ret._Float = reflect.ValueOf(t).Float()
+	case *DA:
+		ret._Type = ARRAY
+		ret._Array = t
+	case *DO:
+		ret._Type = OBJECT
+		ret._Object = t
+	case DA:
+		ret._Type = ARRAY
+		ret._Array = &t
+	case DO:
+		ret._Type = OBJECT
+		ret._Object = &t
+	case *JSON:
+		ret = t
+	case JSON:
+		ret = &t
+	case nil:
+		ret._Type = NULL
+	}
+
+	return ret
+
 }
